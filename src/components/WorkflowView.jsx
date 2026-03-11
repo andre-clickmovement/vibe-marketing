@@ -15,9 +15,8 @@ export default function WorkflowView({ workflow, onOpenSkill, onBack }) {
         }
         .wfv-back:hover { color: var(--gold); }
         .wfv-inner { max-width: 640px; margin: 0 auto; }
-        .wfv-icon { font-size: 48px; margin-bottom: 16px; }
-        .wfv-title { font-size: 32px; font-weight: 700; margin: 0 0 8px; }
-        .wfv-desc { color: var(--text-secondary); font-size: 16px; margin: 0 0 8px; }
+        .wfv-title { font-size: 28px; font-weight: 600; margin: 0 0 8px; }
+        .wfv-desc { color: var(--text-muted); font-size: 15px; margin: 0 0 8px; }
         .wfv-time {
           font-size: 13px;
           color: var(--text-muted);
@@ -67,25 +66,31 @@ export default function WorkflowView({ workflow, onOpenSkill, onBack }) {
         .wfv-step-time { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
         .wfv-start {
           width: 100%;
-          padding: 16px 32px;
-          background: transparent;
-          border: 2px solid var(--gold);
-          border-radius: 10px;
-          color: var(--gold);
-          font-size: 16px;
-          font-weight: 600;
+          padding: 14px 32px;
+          background: var(--gold);
+          border: none;
+          border-radius: 8px;
+          color: var(--bg-primary);
+          font-size: 14px;
+          font-weight: 500;
           margin-top: 24px;
         }
         .wfv-start:hover {
-          background: var(--gold);
-          color: var(--bg-primary);
+          background: #c99a49;
         }
       `}</style>
 
-      <button className="wfv-back" onClick={onBack}>← Back to Dashboard</button>
+      <button className="wfv-back" onClick={onBack}>Back to Dashboard</button>
 
       <div className="wfv-inner">
-        <div className="wfv-icon">{workflow.icon}</div>
+        <div style={{
+          fontSize: 11,
+          fontFamily: 'var(--font-mono)',
+          color: 'var(--text-muted)',
+          letterSpacing: 2,
+          textTransform: 'uppercase',
+          marginBottom: 8
+        }}>Workflow</div>
         <h1 className="wfv-title">{workflow.name}</h1>
         <p className="wfv-desc">{workflow.description}</p>
         <div className="wfv-time">Estimated: {workflow.time}</div>
@@ -98,8 +103,8 @@ export default function WorkflowView({ workflow, onOpenSkill, onBack }) {
             const layer = LAYER_META[skill.layer];
             return (
               <div key={stepId} className="wfv-step" onClick={() => onOpenSkill(stepId)}>
-                <div className="wfv-step-icon" style={{ background: layer.color + '18', border: `1px solid ${layer.color}30` }}>
-                  {skill.icon}
+                <div className="wfv-step-icon" style={{ background: layer.color + '18', border: `1px solid ${layer.color}30`, fontFamily: 'var(--font-mono)', fontWeight: 600, color: layer.color }}>
+                  {skill.shortLabel}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -109,14 +114,14 @@ export default function WorkflowView({ workflow, onOpenSkill, onBack }) {
                   <div className="wfv-step-tag">{skill.tagline}</div>
                   <div className="wfv-step-time">~{skill.time}</div>
                 </div>
-                <div style={{ color: 'var(--border-hover)', fontSize: 18, alignSelf: 'center' }}>→</div>
+                <div style={{ color: 'var(--border-hover)', fontSize: 14, alignSelf: 'center' }}>Open</div>
               </div>
             );
           })}
         </div>
 
         <button className="wfv-start" onClick={() => onOpenSkill(workflow.steps[0])}>
-          Start with {getSkillById(workflow.steps[0])?.name} →
+          Start with {getSkillById(workflow.steps[0])?.name}
         </button>
       </div>
     </div>

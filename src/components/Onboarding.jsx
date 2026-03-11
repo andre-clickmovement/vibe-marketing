@@ -73,13 +73,13 @@ export default function Onboarding({ onComplete, onBack }) {
           margin-bottom: 12px;
         }
         .ob-title {
-          font-size: 32px;
-          font-weight: 700;
+          font-size: 28px;
+          font-weight: 600;
           margin: 0 0 8px;
         }
         .ob-subtitle {
-          color: var(--text-secondary);
-          font-size: 16px;
+          color: var(--text-muted);
+          font-size: 15px;
           margin: 0 0 40px;
         }
         .ob-label {
@@ -124,7 +124,9 @@ export default function Onboarding({ onComplete, onBack }) {
           align-items: center;
           justify-content: center;
           border-radius: 8px;
-          font-size: 28px;
+          font-size: 13px;
+          font-weight: 600;
+          font-family: var(--font-mono);
           flex-shrink: 0;
         }
         .ob-nav {
@@ -142,16 +144,15 @@ export default function Onboarding({ onComplete, onBack }) {
         }
         .ob-next {
           padding: 12px 32px;
-          background: transparent;
-          border: 2px solid var(--gold);
+          background: var(--gold);
+          border: none;
           border-radius: 8px;
-          color: var(--gold);
-          font-size: 15px;
-          font-weight: 600;
+          color: var(--bg-primary);
+          font-size: 14px;
+          font-weight: 500;
         }
         .ob-next:hover:not(:disabled) {
-          background: var(--gold);
-          color: var(--bg-primary);
+          background: #c99a49;
         }
         .api-desc {
           font-size: 12px;
@@ -210,21 +211,36 @@ export default function Onboarding({ onComplete, onBack }) {
           {/* Step 1: Goal */}
           {step === 1 && (
             <div className="animate-fade-in" style={{ display: 'grid', gap: 12 }}>
-              {GOALS.map((g) => (
+              {GOALS.map((g, index) => (
                 <div
                   key={g.id}
                   className={`ob-goal-card ${selectedGoal === g.id ? 'selected' : ''}`}
                   onClick={() => setSelectedGoal(g.id)}
                 >
-                  <div className="ob-goal-icon" style={{ background: selectedGoal === g.id ? 'var(--gold-dim)' : 'var(--bg-elevated)' }}>
-                    {g.icon}
+                  <div className="ob-goal-icon" style={{
+                    background: selectedGoal === g.id ? 'var(--gold-dim)' : 'var(--bg-elevated)',
+                    color: selectedGoal === g.id ? 'var(--gold)' : 'var(--text-muted)',
+                    border: selectedGoal === g.id ? '1px solid var(--gold)' : '1px solid var(--border)',
+                  }}>
+                    {String(index + 1).padStart(2, '0')}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, fontSize: 16 }}>{g.label}</div>
                     <div style={{ fontSize: 14, color: 'var(--text-secondary)' }}>{g.desc}</div>
                   </div>
                   {selectedGoal === g.id && (
-                    <div style={{ color: 'var(--gold)', fontSize: 20 }}>✓</div>
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 6,
+                      background: 'var(--gold)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--bg-primary)',
+                      fontSize: 14,
+                      fontWeight: 600,
+                    }}>&#10003;</div>
                   )}
                 </div>
               ))}
@@ -265,7 +281,7 @@ export default function Onboarding({ onComplete, onBack }) {
               {step === 0 ? 'Back' : 'Previous'}
             </button>
             <button className="ob-next" disabled={!canAdvance} onClick={handleNext}>
-              {step < STEPS.length - 1 ? 'Continue' : 'Build My Brand →'}
+              {step < STEPS.length - 1 ? 'Continue' : 'Build My Brand'}
             </button>
           </div>
         </div>

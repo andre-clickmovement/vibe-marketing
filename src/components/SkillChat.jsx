@@ -61,7 +61,17 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           padding: 4px;
         }
         .chat-back:hover { color: var(--gold); }
-        .chat-skill-icon { font-size: 24px; }
+        .chat-skill-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          font-weight: 600;
+          font-family: var(--font-mono);
+        }
         .chat-skill-name { font-weight: 600; font-size: 16px; }
         .chat-skill-tag { font-size: 12px; color: var(--text-muted); }
         .chat-layer-badge {
@@ -82,7 +92,18 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           padding: 60px 24px;
           color: var(--text-muted);
         }
-        .chat-empty-icon { font-size: 48px; margin-bottom: 16px; }
+        .chat-empty-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          font-weight: 600;
+          font-family: var(--font-mono);
+          margin: 0 auto 16px;
+        }
         .chat-empty-name { font-size: 18px; font-weight: 500; color: var(--text-secondary); margin-bottom: 8px; }
         .chat-empty-desc {
           font-size: 14px;
@@ -98,14 +119,14 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           flex-wrap: wrap;
         }
         .chat-prompt-btn {
-          padding: 8px 16px;
-          background: var(--bg-card);
-          border: 1px solid var(--border-hover);
-          border-radius: 20px;
+          padding: 10px 16px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 8px;
           color: var(--text-secondary);
           font-size: 13px;
         }
-        .chat-prompt-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .chat-prompt-btn:hover { border-color: var(--border-hover); color: var(--text-primary); background: var(--bg-card); }
         /* Messages */
         .chat-msg {
           margin-bottom: 24px;
@@ -182,17 +203,16 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
         }
         .chat-send {
           padding: 14px 24px;
-          background: transparent;
-          border: 2px solid var(--gold);
-          border-radius: 10px;
-          color: var(--gold);
-          font-weight: 600;
-          font-size: 15px;
+          background: var(--gold);
+          border: none;
+          border-radius: 8px;
+          color: var(--bg-primary);
+          font-weight: 500;
+          font-size: 14px;
           white-space: nowrap;
         }
         .chat-send:hover:not(:disabled) {
-          background: var(--gold);
-          color: var(--bg-primary);
+          background: #c99a49;
         }
         .chat-stop {
           padding: 14px 24px;
@@ -209,8 +229,8 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
 
       {/* Header */}
       <div className="chat-header">
-        <button className="chat-back" onClick={onBack}>←</button>
-        <div className="chat-skill-icon">{skill.icon}</div>
+        <button className="chat-back" onClick={onBack}>Back</button>
+        <div className="chat-skill-icon" style={{ background: layer.color + '15', color: layer.color, border: `1px solid ${layer.color}25` }}>{skill.shortLabel}</div>
         <div>
           <div className="chat-skill-name">{skill.name}</div>
           <div className="chat-skill-tag">{skill.tagline}</div>
@@ -224,7 +244,7 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
       <div className="chat-body" ref={scrollRef}>
         {messages.length === 0 && !isStreaming && (
           <div className="chat-empty">
-            <div className="chat-empty-icon">{skill.icon}</div>
+            <div className="chat-empty-icon" style={{ background: layer.color + '15', color: layer.color, border: `1px solid ${layer.color}25` }}>{skill.shortLabel}</div>
             <div className="chat-empty-name">{skill.name}</div>
             <div className="chat-empty-desc">{skill.description}</div>
             <div className="chat-prompts">
@@ -251,9 +271,15 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           <div key={i} className="chat-msg">
             <div
               className="chat-msg-avatar"
-              style={{ background: msg.role === 'user' ? 'var(--bg-elevated)' : 'var(--gold-dim)' }}
+              style={{
+                background: msg.role === 'user' ? 'var(--bg-elevated)' : layer.color + '15',
+                color: msg.role === 'user' ? 'var(--text-muted)' : layer.color,
+                fontSize: 11,
+                fontWeight: 600,
+                fontFamily: 'var(--font-mono)',
+              }}
             >
-              {msg.role === 'user' ? '→' : skill.icon}
+              {msg.role === 'user' ? 'You' : skill.shortLabel}
             </div>
             <div className="chat-msg-body">
               <div className="chat-msg-role">
@@ -272,7 +298,7 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
 
         {isStreaming && messages.length > 0 && messages[messages.length - 1].role !== 'assistant' && (
           <div className="chat-loading">
-            <div className="chat-msg-avatar" style={{ background: 'var(--gold-dim)' }}>{skill.icon}</div>
+            <div className="chat-msg-avatar" style={{ background: layer.color + '15', color: layer.color, fontSize: 11, fontWeight: 600, fontFamily: 'var(--font-mono)' }}>{skill.shortLabel}</div>
             <div className="chat-dots">
               {[0, 1, 2].map((i) => (
                 <div key={i} className="chat-dot" style={{ animation: `pulse 1.2s ease infinite ${i * 0.2}s` }} />
@@ -301,7 +327,7 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
               disabled={!input.trim()}
               onClick={handleSend}
             >
-              Send →
+              Send
             </button>
           )}
         </div>

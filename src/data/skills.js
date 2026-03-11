@@ -4,7 +4,7 @@ export const SKILLS = [
     id: 'brand-voice',
     name: 'Brand Voice',
     layer: 'foundation',
-    icon: '🎙',
+    shortLabel: 'BV',
     tagline: 'Extract or build your voice profile',
     description:
       'Analyzes your content samples, website, or answers to build a voice profile that makes every piece of content sound like you.',
@@ -22,7 +22,7 @@ export const SKILLS = [
     id: 'positioning-angles',
     name: 'Positioning & Angles',
     layer: 'foundation',
-    icon: '🎯',
+    shortLabel: 'PA',
     tagline: 'Find the angle that makes your offer stand out',
     description:
       'Performs competitive analysis, maps saturated vs. white-space claims, and generates 8 angle types using Schwartz, Dunford, and Hormozi frameworks.',
@@ -40,7 +40,7 @@ export const SKILLS = [
     id: 'keyword-research',
     name: 'Keyword Research',
     layer: 'strategy',
-    icon: '🔍',
+    shortLabel: 'KR',
     tagline: 'Data-backed keyword clusters and priorities',
     description:
       'Maps your content territory using the 6-Circles Method — search volume, difficulty, intent classification, and content gap analysis.',
@@ -58,7 +58,7 @@ export const SKILLS = [
     id: 'lead-magnet',
     name: 'Lead Magnet',
     layer: 'strategy',
-    icon: '🧲',
+    shortLabel: 'LM',
     tagline: 'Concept + build list-growing assets',
     description:
       'Generates lead magnet concepts grounded in competitive research, then builds the actual content — checklists, templates, quizzes, guides.',
@@ -75,7 +75,7 @@ export const SKILLS = [
     id: 'direct-response-copy',
     name: 'Direct Response Copy',
     layer: 'execution',
-    icon: '✍️',
+    shortLabel: 'DR',
     tagline: 'Landing pages, sales copy, headlines that convert',
     description:
       'Embeds Schwartz, Hopkins, Ogilvy, Halbert, Caples, Sugarman, and Collier methodologies. 7-dimension scoring, variant generation, AI-tell detection.',
@@ -92,7 +92,7 @@ export const SKILLS = [
     id: 'seo-content',
     name: 'SEO Content',
     layer: 'execution',
-    icon: '📝',
+    shortLabel: 'SEO',
     tagline: 'Long-form articles that rank and read like a human wrote them',
     description:
       'Live SERP analysis, People Also Ask coverage, E-E-A-T optimization, schema markup generation, and content refresh mode.',
@@ -109,7 +109,7 @@ export const SKILLS = [
     id: 'email-sequences',
     name: 'Email Sequences',
     layer: 'execution',
-    icon: '📧',
+    shortLabel: 'ES',
     tagline: 'Welcome, nurture, launch, and re-engagement flows',
     description:
       'Builds 6 sequence types with subject line variants, send timing, and optional ESP integration for Mailchimp, ConvertKit, or HubSpot.',
@@ -126,7 +126,7 @@ export const SKILLS = [
     id: 'newsletter',
     name: 'Newsletter',
     layer: 'execution',
-    icon: '📰',
+    shortLabel: 'NL',
     tagline: 'Newsletter editions modeled on top creators',
     description:
       '6 newsletter archetypes with format templates, growth strategy, and edition planning based on your voice and audience.',
@@ -143,7 +143,7 @@ export const SKILLS = [
     id: 'creative',
     name: 'Creative Engine',
     layer: 'execution',
-    icon: '🎨',
+    shortLabel: 'CE',
     tagline: 'AI image, video, ads, and graphics',
     description:
       '5 production modes: Product Photo, Product Video, Social Graphics, Talking Head, and Ad Creative. Uses Replicate API or generates prompts.',
@@ -160,8 +160,8 @@ export const SKILLS = [
     id: 'content-atomizer',
     name: 'Content Atomizer',
     layer: 'distribution',
-    icon: '💥',
-    tagline: 'One piece → 8 platforms',
+    shortLabel: 'CA',
+    tagline: 'One piece to 8 platforms',
     description:
       'Repurposes any content into platform-optimized posts for LinkedIn, Twitter/X, Instagram, TikTok, YouTube, Facebook, email, and blog.',
     time: '10–15 min',
@@ -184,7 +184,6 @@ export const WORKFLOWS = [
     trigger: 'First-time setup',
     steps: ['brand-voice', 'positioning-angles'],
     time: '20–30 min',
-    icon: '🚀',
   },
   {
     id: 'new-idea',
@@ -193,7 +192,6 @@ export const WORKFLOWS = [
     trigger: '"Launch this" / "New product"',
     steps: ['positioning-angles', 'direct-response-copy', 'lead-magnet'],
     time: '45–60 min',
-    icon: '💡',
   },
   {
     id: 'need-leads',
@@ -202,7 +200,6 @@ export const WORKFLOWS = [
     trigger: '"Build my list" / "Lead magnet funnel"',
     steps: ['lead-magnet', 'direct-response-copy', 'email-sequences', 'content-atomizer'],
     time: '60–90 min',
-    icon: '📊',
   },
   {
     id: 'content-strategy',
@@ -211,7 +208,6 @@ export const WORKFLOWS = [
     trigger: '"Content plan" / "What should I write"',
     steps: ['keyword-research', 'seo-content', 'content-atomizer', 'newsletter'],
     time: '60–90 min',
-    icon: '📚',
   },
   {
     id: 'launch',
@@ -226,7 +222,6 @@ export const WORKFLOWS = [
       'creative',
     ],
     time: '90–120 min',
-    icon: '🎯',
   },
   {
     id: 'newsletter-start',
@@ -235,7 +230,6 @@ export const WORKFLOWS = [
     trigger: '"Newsletter" / "Weekly email"',
     steps: ['newsletter'],
     time: '15–20 min',
-    icon: '📰',
   },
 ];
 
@@ -249,10 +243,10 @@ export const LAYER_META = {
 
 // ─── Goals ───
 export const GOALS = [
-  { id: 'build-audience', label: 'Build Audience', desc: 'Grow your list and following from scratch', icon: '👥' },
-  { id: 'launch-product', label: 'Launch Product', desc: 'Take something new to market', icon: '🚀' },
-  { id: 'grow-revenue', label: 'Grow Revenue', desc: 'Increase sales from existing audience', icon: '📈' },
-  { id: 'content-system', label: 'Create Content System', desc: 'Build a repeatable content machine', icon: '⚙️' },
+  { id: 'build-audience', label: 'Build Audience', desc: 'Grow your list and following from scratch' },
+  { id: 'launch-product', label: 'Launch Product', desc: 'Take something new to market' },
+  { id: 'grow-revenue', label: 'Grow Revenue', desc: 'Increase sales from existing audience' },
+  { id: 'content-system', label: 'Create Content System', desc: 'Build a repeatable content machine' },
 ];
 
 // ─── Helpers ───

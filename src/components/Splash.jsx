@@ -27,19 +27,18 @@ export default function Splash({ onStart, onSkip }) {
           position: absolute;
           inset: 0;
           background-image:
-            linear-gradient(rgba(232,185,49,0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(232,185,49,0.05) 1px, transparent 1px);
-          background-size: 48px 48px;
-          animation: gridPulse 6s ease infinite;
+            linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+          background-size: 64px 64px;
         }
         .splash-glow {
           position: absolute;
-          top: -20%;
+          top: -30%;
           left: 50%;
           transform: translateX(-50%);
-          width: 800px;
-          height: 800px;
-          background: radial-gradient(circle, rgba(232,185,49,0.06) 0%, transparent 70%);
+          width: 900px;
+          height: 900px;
+          background: radial-gradient(circle, rgba(212, 168, 85, 0.04) 0%, transparent 60%);
           border-radius: 50%;
           pointer-events: none;
         }
@@ -59,27 +58,31 @@ export default function Splash({ onStart, onSkip }) {
         }
         .splash-badge {
           font-family: var(--font-mono);
-          font-size: 13px;
-          letter-spacing: 4px;
-          color: var(--gold);
+          font-size: 11px;
+          letter-spacing: 3px;
+          color: var(--text-muted);
           margin-bottom: 24px;
           text-transform: uppercase;
+          padding: 8px 16px;
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          display: inline-block;
         }
         .splash-title {
-          font-size: clamp(36px, 6vw, 56px);
-          font-weight: 800;
-          line-height: 1.05;
+          font-size: clamp(32px, 5vw, 48px);
+          font-weight: 600;
+          line-height: 1.1;
           margin: 0 0 20px;
-          letter-spacing: -1px;
+          letter-spacing: -0.5px;
         }
         .splash-title span { color: var(--gold); }
         .splash-sub {
-          font-size: 18px;
-          line-height: 1.6;
+          font-size: 17px;
+          line-height: 1.7;
           color: var(--text-secondary);
-          max-width: 480px;
+          max-width: 460px;
           margin: 0 auto 48px;
-          font-weight: 300;
+          font-weight: 400;
         }
         .splash-actions {
           display: flex;
@@ -88,52 +91,52 @@ export default function Splash({ onStart, onSkip }) {
           flex-wrap: wrap;
         }
         .splash-cta {
-          padding: 16px 40px;
-          font-size: 16px;
-          font-weight: 600;
-          background: transparent;
-          color: var(--gold);
-          border: 2px solid var(--gold);
+          padding: 14px 32px;
+          font-size: 14px;
+          font-weight: 500;
+          background: var(--gold);
+          color: var(--bg-primary);
+          border: none;
           border-radius: 8px;
         }
         .splash-cta:hover {
-          background: var(--gold);
-          color: var(--bg-primary);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(232,185,49,0.3);
+          background: #c99a49;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(212, 168, 85, 0.25);
         }
         .splash-ghost {
-          padding: 16px 40px;
-          font-size: 16px;
-          font-weight: 400;
+          padding: 14px 32px;
+          font-size: 14px;
+          font-weight: 500;
           background: transparent;
-          color: var(--text-muted);
-          border: 1px solid var(--border-hover);
+          color: var(--text-secondary);
+          border: 1px solid var(--border);
           border-radius: 8px;
         }
         .splash-ghost:hover {
-          border-color: var(--gold);
-          color: var(--gold);
+          border-color: var(--border-hover);
+          color: var(--text-primary);
+          background: var(--bg-elevated);
         }
         .splash-stats {
           display: flex;
-          gap: 32px;
+          gap: 48px;
           justify-content: center;
           margin-top: 64px;
           flex-wrap: wrap;
         }
         .splash-stat-num {
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--gold);
+          font-size: 24px;
+          font-weight: 600;
+          color: var(--text-primary);
           font-family: var(--font-mono);
         }
         .splash-stat-label {
-          font-size: 12px;
+          font-size: 11px;
           color: var(--text-muted);
           letter-spacing: 1px;
           text-transform: uppercase;
-          margin-top: 4px;
+          margin-top: 6px;
         }
       `}</style>
 

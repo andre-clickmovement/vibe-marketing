@@ -97,7 +97,7 @@ export function useChat() {
     } catch (err) {
       if (err.name === 'AbortError') return '';
 
-      const errorMsg = `⚠ ${err.message}`;
+      const errorMsg = `Error: ${err.message}`;
       setMessages((prev) => [...prev, { role: 'assistant', content: errorMsg }]);
       return errorMsg;
     } finally {

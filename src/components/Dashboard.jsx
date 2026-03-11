@@ -26,9 +26,10 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         }
         .dash-nav-logo {
           font-family: var(--font-mono);
-          font-size: 14px;
-          font-weight: 700;
-          color: var(--gold);
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-primary);
+          letter-spacing: 1px;
         }
         .dash-nav-sub {
           font-size: 13px;
@@ -64,13 +65,13 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         }
         .foundation-badge {
           font-family: var(--font-mono);
-          font-size: 11px;
-          letter-spacing: 2px;
+          font-size: 10px;
+          letter-spacing: 1.5px;
           color: var(--text-muted);
           text-transform: uppercase;
-          margin-bottom: 4px;
+          margin-bottom: 6px;
         }
-        .foundation-title { font-size: 20px; font-weight: 600; }
+        .foundation-title { font-size: 18px; font-weight: 600; }
         .foundation-ring {
           width: 56px;
           height: 56px;
@@ -102,12 +103,13 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         .foundation-hint {
           margin-top: 16px;
           padding: 12px 16px;
-          background: var(--gold-dim);
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
           border-radius: 8px;
-          font-size: 14px;
-          color: var(--gold);
+          font-size: 13px;
+          color: var(--text-secondary);
         }
-        .foundation-hint strong { cursor: pointer; text-decoration: underline; }
+        .foundation-hint strong { cursor: pointer; text-decoration: underline; color: var(--gold); }
         /* Skills */
         .skills-section { margin-bottom: 48px; }
         .section-title { font-size: 20px; font-weight: 600; margin: 0 0 20px; }
@@ -144,9 +146,8 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           transition: all 0.25s var(--ease);
         }
         .skill-card:hover {
-          border-color: var(--gold);
-          transform: translateY(-2px);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+          border-color: var(--border-hover);
+          background: var(--bg-elevated);
         }
         .skill-card-head {
           display: flex;
@@ -154,14 +155,25 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           align-items: flex-start;
           margin-bottom: 10px;
         }
-        .skill-card-icon { font-size: 28px; }
+        .skill-card-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 600;
+          font-family: var(--font-mono);
+          letter-spacing: -0.5px;
+        }
         .skill-card-time {
           font-size: 11px;
           color: var(--text-muted);
           font-family: var(--font-mono);
         }
-        .skill-card-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-        .skill-card-tag { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+        .skill-card-name { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
+        .skill-card-tag { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
         /* Workflows */
         .wf-grid {
           display: grid;
@@ -177,8 +189,8 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           transition: all 0.25s var(--ease);
         }
         .wf-card:hover {
-          border-color: var(--teal);
-          transform: translateY(-1px);
+          border-color: var(--border-hover);
+          background: var(--bg-elevated);
         }
         .wf-steps {
           display: flex;
@@ -235,7 +247,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           <div className="dash-nav-sub">Marketing Skills</div>
         </div>
         <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>
-          ⚙ Settings
+          Settings
         </button>
       </nav>
 
@@ -269,7 +281,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
                 {foundationComplete === 0
                   ? 'Not started yet'
                   : foundationComplete === foundationTotal
-                  ? 'Foundation complete ✓'
+                  ? 'Foundation complete'
                   : `${foundationComplete}/${foundationTotal} complete`}
               </div>
             </div>
@@ -286,28 +298,50 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
 
           <div className="foundation-items">
             {[
-              { key: 'voiceProfile', label: 'Voice Profile', skill: 'brand-voice', icon: '🎙' },
-              { key: 'positioning', label: 'Positioning', skill: 'positioning-angles', icon: '🎯' },
+              { key: 'voiceProfile', label: 'Voice Profile', skill: 'brand-voice', shortLabel: 'BV' },
+              { key: 'positioning', label: 'Positioning', skill: 'positioning-angles', shortLabel: 'PA' },
             ].map((item) => (
               <div
                 key={item.key}
                 className={`foundation-item ${brand[item.key] ? 'done' : ''}`}
                 onClick={() => onOpenSkill(item.skill)}
               >
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span>{item.icon}</span>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <span style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 6,
+                    background: brand[item.key] ? 'var(--teal-dim)' : 'var(--bg-elevated)',
+                    border: `1px solid ${brand[item.key] ? 'var(--teal)' : 'var(--border-hover)'}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    fontFamily: 'var(--font-mono)',
+                    color: brand[item.key] ? 'var(--teal)' : 'var(--text-muted)',
+                  }}>{item.shortLabel}</span>
                   <span style={{ fontSize: 14, fontWeight: 500 }}>{item.label}</span>
                 </div>
-                <span style={{ fontSize: 14, color: brand[item.key] ? 'var(--teal)' : 'var(--text-muted)' }}>
-                  {brand[item.key] ? '✓' : '○'}
-                </span>
+                <span style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 4,
+                  background: brand[item.key] ? 'var(--teal)' : 'transparent',
+                  border: brand[item.key] ? 'none' : '1px solid var(--border-hover)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 12,
+                  color: brand[item.key] ? 'var(--bg-primary)' : 'var(--text-muted)',
+                }}>{brand[item.key] ? '✓' : ''}</span>
               </div>
             ))}
           </div>
 
           {foundationComplete === 0 && (
             <div className="foundation-hint">
-              → Start with{' '}
+              Start with{' '}
               <strong onClick={() => onOpenSkill('brand-voice')}>Brand Voice</strong> to build
               your foundation. Every skill works without it, but output will be personalized once
               it's set.
@@ -331,7 +365,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
                   {layerSkills.map((skill) => (
                     <div key={skill.id} className="skill-card" onClick={() => onOpenSkill(skill.id)}>
                       <div className="skill-card-head">
-                        <div className="skill-card-icon">{skill.icon}</div>
+                        <div className="skill-card-icon" style={{ background: meta.color + '15', color: meta.color, border: `1px solid ${meta.color}25` }}>{skill.shortLabel}</div>
                         <div className="skill-card-time">~{skill.time}</div>
                       </div>
                       <div className="skill-card-name">{skill.name}</div>
@@ -351,19 +385,27 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
             {WORKFLOWS.map((wf) => (
               <div key={wf.id} className="wf-card" onClick={() => onOpenWorkflow(wf.id)}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <div style={{ fontSize: 28 }}>{wf.icon}</div>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{wf.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{wf.time}</div>
                 </div>
-                <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4 }}>{wf.name}</div>
                 <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 12 }}>{wf.description}</div>
                 <div className="wf-steps">
                   {wf.steps.map((stepId, i) => {
                     const s = getSkillById(stepId);
+                    const layer = LAYER_META[s.layer];
                     return (
                       <span key={stepId} className="wf-step-pill">
-                        <span>{s.icon}</span>
+                        <span style={{
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          background: layer.color + '15',
+                          color: layer.color,
+                          fontSize: 10,
+                          fontWeight: 600,
+                          fontFamily: 'var(--font-mono)',
+                        }}>{s.shortLabel}</span>
                         <span>{s.name}</span>
-                        {i < wf.steps.length - 1 && <span className="wf-arrow">→</span>}
+                        {i < wf.steps.length - 1 && <span className="wf-arrow">/</span>}
                       </span>
                     );
                   })}

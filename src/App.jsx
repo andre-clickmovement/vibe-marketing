@@ -53,7 +53,7 @@ export default function App() {
 
     // Auto-save foundation skill outputs to brand memory
     const skill = getSkillById(activeSkillId);
-    if (skill?.brandKey && response && !response.startsWith('⚠')) {
+    if (skill?.brandKey && response && !response.startsWith('Error:')) {
       brandStore.updateBrand(skill.brandKey, response);
     }
 
