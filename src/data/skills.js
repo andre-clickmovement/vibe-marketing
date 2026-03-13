@@ -1,5 +1,6 @@
 // ─── Skill Registry ───
 export const SKILLS = [
+  // Foundation Layer
   {
     id: 'brand-voice',
     name: 'Brand Voice',
@@ -37,9 +38,30 @@ export const SKILLS = [
     ],
   },
   {
+    id: 'great-hooks',
+    name: 'Great Hooks',
+    layer: 'foundation',
+    shortLabel: 'GH',
+    tagline: 'High-converting sales leads using the six archetypes',
+    description:
+      'Expert copywriting of sales leads using the six-archetype system from Great Leads — Offer, Promise, Problem-Solution, Secret, Proclamation, and Story leads.',
+    time: '15–25 min',
+    produces: 'sales lead copy',
+    brandKey: 'greatHooks',
+    needs: [],
+    quickPrompts: [
+      'Write an Offer Lead for my product',
+      'Create a Story Lead for my sales page',
+      'Diagnose my prospect awareness level',
+      'Which lead type should I use for my market?',
+    ],
+  },
+
+  // Content Strategy Layer
+  {
     id: 'keyword-research',
     name: 'Keyword Research',
-    layer: 'strategy',
+    layer: 'content-strategy',
     shortLabel: 'KR',
     tagline: 'Data-backed keyword clusters and priorities',
     description:
@@ -55,43 +77,9 @@ export const SKILLS = [
     ],
   },
   {
-    id: 'lead-magnet',
-    name: 'Lead Magnet',
-    layer: 'strategy',
-    shortLabel: 'LM',
-    tagline: 'Concept + build list-growing assets',
-    description:
-      'Generates lead magnet concepts grounded in competitive research, then builds the actual content — checklists, templates, quizzes, guides.',
-    time: '15–25 min',
-    produces: 'lead magnet content',
-    needs: ['voiceProfile', 'positioning'],
-    quickPrompts: [
-      'Create a lead magnet for my business',
-      'Build a quiz that qualifies leads',
-      'What format works best for my audience?',
-    ],
-  },
-  {
-    id: 'direct-response-copy',
-    name: 'Direct Response Copy',
-    layer: 'execution',
-    shortLabel: 'DR',
-    tagline: 'Landing pages, sales copy, headlines that convert',
-    description:
-      'Embeds Schwartz, Hopkins, Ogilvy, Halbert, Caples, Sugarman, and Collier methodologies. 7-dimension scoring, variant generation, AI-tell detection.',
-    time: '15–30 min',
-    produces: 'copy variants',
-    needs: ['voiceProfile', 'positioning'],
-    quickPrompts: [
-      'Write a landing page for my product',
-      'Generate 10 headline variants',
-      'Write a sales page with proof stacking',
-    ],
-  },
-  {
     id: 'seo-content',
     name: 'SEO Content',
-    layer: 'execution',
+    layer: 'content-strategy',
     shortLabel: 'SEO',
     tagline: 'Long-form articles that rank and read like a human wrote them',
     description:
@@ -106,26 +94,9 @@ export const SKILLS = [
     ],
   },
   {
-    id: 'email-sequences',
-    name: 'Email Sequences',
-    layer: 'execution',
-    shortLabel: 'ES',
-    tagline: 'Welcome, nurture, launch, and re-engagement flows',
-    description:
-      'Builds 6 sequence types with subject line variants, send timing, and optional ESP integration for Mailchimp, ConvertKit, or HubSpot.',
-    time: '15–25 min',
-    produces: 'email sequence',
-    needs: ['voiceProfile', 'positioning'],
-    quickPrompts: [
-      'Build a 5-email welcome sequence',
-      'Create a product launch sequence',
-      'Write a re-engagement flow for cold subscribers',
-    ],
-  },
-  {
     id: 'newsletter',
-    name: 'Newsletter',
-    layer: 'execution',
+    name: 'Newsletter Writer',
+    layer: 'content-strategy',
     shortLabel: 'NL',
     tagline: 'Newsletter editions modeled on top creators',
     description:
@@ -140,9 +111,97 @@ export const SKILLS = [
     ],
   },
   {
+    id: 'social-creator',
+    name: 'Social Creator',
+    layer: 'content-strategy',
+    shortLabel: 'SC',
+    tagline: 'One piece to 8 platforms',
+    description:
+      'Repurposes any content into platform-optimized posts for LinkedIn, Twitter/X, Instagram, TikTok, YouTube, Facebook, email, and blog.',
+    time: '10–15 min',
+    produces: 'platform posts',
+    needs: ['voiceProfile'],
+    quickPrompts: [
+      'Repurpose my latest blog post across platforms',
+      'Turn this article into a LinkedIn thread',
+      'Create a week of social content from this piece',
+    ],
+  },
+
+  // Marketing Execution Layer
+  {
+    id: 'great-hooks-exec',
+    name: 'Great Hooks',
+    layer: 'marketing-execution',
+    shortLabel: 'GH',
+    tagline: 'High-converting sales leads using the six archetypes',
+    description:
+      'Expert copywriting of sales leads using the six-archetype system from Great Leads — Offer, Promise, Problem-Solution, Secret, Proclamation, and Story leads.',
+    time: '15–25 min',
+    produces: 'sales lead copy',
+    needs: ['voiceProfile', 'positioning'],
+    quickPrompts: [
+      'Write an Offer Lead for my product',
+      'Create a Story Lead for my sales page',
+      'Diagnose my prospect awareness level',
+      'Which lead type should I use for my market?',
+    ],
+  },
+  {
+    id: 'direct-response-copy',
+    name: 'Direct Response Copy',
+    layer: 'marketing-execution',
+    shortLabel: 'DR',
+    tagline: 'Landing pages, sales copy, headlines that convert',
+    description:
+      'Embeds Schwartz, Hopkins, Ogilvy, Halbert, Caples, Sugarman, and Collier methodologies. 7-dimension scoring, variant generation, AI-tell detection.',
+    time: '15–30 min',
+    produces: 'copy variants',
+    needs: ['voiceProfile', 'positioning'],
+    quickPrompts: [
+      'Write a landing page for my product',
+      'Generate 10 headline variants',
+      'Write a sales page with proof stacking',
+    ],
+  },
+  {
+    id: 'lead-magnet',
+    name: 'Lead Magnets',
+    layer: 'marketing-execution',
+    shortLabel: 'LM',
+    tagline: 'Concept + build list-growing assets',
+    description:
+      'Generates lead magnet concepts grounded in competitive research, then builds the actual content — checklists, templates, quizzes, guides.',
+    time: '15–25 min',
+    produces: 'lead magnet content',
+    needs: ['voiceProfile', 'positioning'],
+    quickPrompts: [
+      'Create a lead magnet for my business',
+      'Build a quiz that qualifies leads',
+      'What format works best for my audience?',
+    ],
+  },
+  {
+    id: 'email-sequences',
+    name: 'Email Sequences',
+    layer: 'marketing-execution',
+    shortLabel: 'ES',
+    tagline: 'Welcome, nurture, launch, and re-engagement flows',
+    description:
+      'Builds 6 sequence types with subject line variants, send timing, and optional ESP integration for Mailchimp, ConvertKit, or HubSpot.',
+    time: '15–25 min',
+    produces: 'email sequence',
+    needs: ['voiceProfile', 'positioning'],
+    quickPrompts: [
+      'Build a 5-email welcome sequence',
+      'Create a product launch sequence',
+      'Write a re-engagement flow for cold subscribers',
+    ],
+  },
+  {
     id: 'creative',
     name: 'Creative Engine',
-    layer: 'execution',
+    layer: 'marketing-execution',
     shortLabel: 'CE',
     tagline: 'AI image, video, ads, and graphics',
     description:
@@ -156,23 +215,6 @@ export const SKILLS = [
       'Build an ad creative testing matrix',
     ],
   },
-  {
-    id: 'content-atomizer',
-    name: 'Content Atomizer',
-    layer: 'distribution',
-    shortLabel: 'CA',
-    tagline: 'One piece to 8 platforms',
-    description:
-      'Repurposes any content into platform-optimized posts for LinkedIn, Twitter/X, Instagram, TikTok, YouTube, Facebook, email, and blog.',
-    time: '10–15 min',
-    produces: 'platform posts',
-    needs: ['voiceProfile'],
-    quickPrompts: [
-      'Repurpose my latest blog post across platforms',
-      'Turn this article into a LinkedIn thread',
-      'Create a week of social content from this piece',
-    ],
-  },
 ];
 
 // ─── Pre-built Workflows ───
@@ -182,15 +224,15 @@ export const WORKFLOWS = [
     name: 'Starting from Zero',
     description: 'Build your brand foundation from scratch',
     trigger: 'First-time setup',
-    steps: ['brand-voice', 'positioning-angles'],
-    time: '20–30 min',
+    steps: ['brand-voice', 'positioning-angles', 'great-hooks'],
+    time: '30–45 min',
   },
   {
     id: 'new-idea',
     name: 'I Have an Idea',
     description: 'Take a product idea to market-ready copy',
     trigger: '"Launch this" / "New product"',
-    steps: ['positioning-angles', 'direct-response-copy', 'lead-magnet'],
+    steps: ['positioning-angles', 'great-hooks-exec', 'direct-response-copy'],
     time: '45–60 min',
   },
   {
@@ -198,7 +240,7 @@ export const WORKFLOWS = [
     name: 'I Need Leads',
     description: 'Build a complete lead generation funnel',
     trigger: '"Build my list" / "Lead magnet funnel"',
-    steps: ['lead-magnet', 'direct-response-copy', 'email-sequences', 'content-atomizer'],
+    steps: ['lead-magnet', 'great-hooks-exec', 'email-sequences', 'social-creator'],
     time: '60–90 min',
   },
   {
@@ -206,7 +248,7 @@ export const WORKFLOWS = [
     name: 'Content Strategy',
     description: 'Plan and execute a content system',
     trigger: '"Content plan" / "What should I write"',
-    steps: ['keyword-research', 'seo-content', 'content-atomizer', 'newsletter'],
+    steps: ['keyword-research', 'seo-content', 'social-creator', 'newsletter'],
     time: '60–90 min',
   },
   {
@@ -216,9 +258,9 @@ export const WORKFLOWS = [
     trigger: '"Product launch" / "Launch campaign"',
     steps: [
       'positioning-angles',
+      'great-hooks-exec',
       'direct-response-copy',
       'email-sequences',
-      'content-atomizer',
       'creative',
     ],
     time: '90–120 min',
@@ -236,9 +278,8 @@ export const WORKFLOWS = [
 // ─── Layer Metadata ───
 export const LAYER_META = {
   foundation: { label: 'Foundation', color: '#E8B931', order: 0 },
-  strategy: { label: 'Strategy', color: '#4ECDC4', order: 1 },
-  execution: { label: 'Execution', color: '#7C6FE0', order: 2 },
-  distribution: { label: 'Distribution', color: '#FF6B6B', order: 3 },
+  'content-strategy': { label: 'Content Strategy', color: '#4ECDC4', order: 1 },
+  'marketing-execution': { label: 'Marketing Execution', color: '#7C6FE0', order: 2 },
 };
 
 // ─── Goals ───

@@ -144,13 +144,17 @@ export default function Splash({ onStart, onSkip }) {
       <div className="splash-glow" />
 
       <div className={`splash-content ${visible ? 'visible' : ''}`}>
-        <div className="splash-badge">Vibe Marketing Skills v2.0</div>
+        <img
+          src="https://customer-assets.emergentagent.com/job_7e29061e-ffd5-4596-a601-775e365ccb93/artifacts/eiumndvy_LevRegWhiteBlue_Logo.png"
+          alt="LevReg"
+          style={{ height: 32, width: 'auto', marginBottom: 24 }}
+        />
         <h1 className="splash-title">
           Your marketing team<br />
           <span>in a browser.</span>
         </h1>
         <p className="splash-sub">
-          11 AI-powered marketing skills that remember your brand, chain together
+          AI-powered marketing skills that remember your brand, chain together
           into workflows, and get sharper every time you use them.
         </p>
         <div className="splash-actions">

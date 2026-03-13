@@ -243,7 +243,11 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
       {/* Nav */}
       <nav className="dash-nav">
         <div className="dash-nav-brand">
-          <div className="dash-nav-logo">VIBE</div>
+          <img
+            src="https://customer-assets.emergentagent.com/job_7e29061e-ffd5-4596-a601-775e365ccb93/artifacts/eiumndvy_LevRegWhiteBlue_Logo.png"
+            alt="LevReg"
+            style={{ height: 28, width: 'auto' }}
+          />
           <div className="dash-nav-sub">Marketing Skills</div>
         </div>
         <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>
@@ -300,6 +304,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
             {[
               { key: 'voiceProfile', label: 'Voice Profile', skill: 'brand-voice', shortLabel: 'BV' },
               { key: 'positioning', label: 'Positioning', skill: 'positioning-angles', shortLabel: 'PA' },
+              { key: 'greatHooks', label: 'Great Hooks', skill: 'great-hooks', shortLabel: 'GH' },
             ].map((item) => (
               <div
                 key={item.key}
@@ -416,7 +421,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         </div>
 
         <div className="dash-footer">
-          Vibe Marketing Skills v2.0 — 11 skills · 5 creative modes · 7 workflows
+          LevReg Skills
         </div>
       </div>
     </div>

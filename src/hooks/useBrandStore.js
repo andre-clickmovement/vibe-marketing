@@ -5,6 +5,7 @@ const STORAGE_KEY = 'vibe-brand-state';
 const createEmptyBrand = () => ({
   voiceProfile: null,
   positioning: null,
+  greatHooks: null,
   audience: null,
   competitors: null,
   creativeKit: null,
@@ -64,6 +65,7 @@ export function useBrandStore() {
     const parts = [];
     if (brand.voiceProfile) parts.push(`## Voice Profile\n${brand.voiceProfile}`);
     if (brand.positioning) parts.push(`## Positioning\n${brand.positioning}`);
+    if (brand.greatHooks) parts.push(`## Great Hooks\n${brand.greatHooks}`);
     if (brand.keywordPlan) parts.push(`## Keyword Plan\n${brand.keywordPlan}`);
     if (brand.stack) parts.push(`## Business Info\n${brand.stack}`);
     if (brand.learnings.length > 0) {
@@ -74,7 +76,7 @@ export function useBrandStore() {
     return parts.join('\n\n') || '';
   }, [brand]);
 
-  const foundationComplete = [brand.voiceProfile, brand.positioning].filter(Boolean).length;
+  const foundationComplete = [brand.voiceProfile, brand.positioning, brand.greatHooks].filter(Boolean).length;
 
   return {
     brand,
@@ -85,6 +87,6 @@ export function useBrandStore() {
     resetBrand,
     getBrandContext,
     foundationComplete,
-    foundationTotal: 2,
+    foundationTotal: 3,
   };
 }
