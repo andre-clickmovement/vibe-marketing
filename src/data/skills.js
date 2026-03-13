@@ -232,7 +232,7 @@ export const WORKFLOWS = [
     name: 'I Have an Idea',
     description: 'Take a product idea to market-ready copy',
     trigger: '"Launch this" / "New product"',
-    steps: ['positioning-angles', 'great-hooks-exec', 'direct-response-copy'],
+    steps: ['positioning-angles', 'great-hooks', 'direct-response-copy', 'lead-magnet'],
     time: '45–60 min',
   },
   {
@@ -240,7 +240,7 @@ export const WORKFLOWS = [
     name: 'I Need Leads',
     description: 'Build a complete lead generation funnel',
     trigger: '"Build my list" / "Lead magnet funnel"',
-    steps: ['lead-magnet', 'great-hooks-exec', 'email-sequences', 'social-creator'],
+    steps: ['lead-magnet', 'great-hooks', 'email-sequences', 'social-creator'],
     time: '60–90 min',
   },
   {
@@ -256,14 +256,8 @@ export const WORKFLOWS = [
     name: 'Launch Campaign',
     description: 'Full product launch across all channels',
     trigger: '"Product launch" / "Launch campaign"',
-    steps: [
-      'positioning-angles',
-      'great-hooks-exec',
-      'direct-response-copy',
-      'email-sequences',
-      'creative',
-    ],
-    time: '90–120 min',
+    steps: ['positioning-angles', 'great-hooks'],
+    time: '30–45 min',
   },
   {
     id: 'newsletter-start',

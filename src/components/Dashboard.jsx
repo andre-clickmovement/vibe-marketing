@@ -203,9 +203,8 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           align-items: center;
           gap: 4px;
         }
-        .wf-step-pill span:first-child { font-size: 14px; }
-        .wf-step-pill span:last-child { font-size: 11px; color: var(--text-muted); }
-        .wf-arrow { color: var(--border-hover); margin: 0 2px; }
+        .wf-step-name { font-size: 12px; color: var(--text-secondary); }
+        .wf-arrow { color: var(--border-hover); margin: 0 2px; font-size: 12px; }
         /* Settings */
         .settings-panel {
           padding: 24px;
@@ -409,7 +408,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
                           fontWeight: 600,
                           fontFamily: 'var(--font-mono)',
                         }}>{s.shortLabel}</span>
-                        <span>{s.name}</span>
+                        <span className="wf-step-name">{s.name}</span>
                         {i < wf.steps.length - 1 && <span className="wf-arrow">/</span>}
                       </span>
                     );
