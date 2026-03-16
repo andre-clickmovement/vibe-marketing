@@ -70,7 +70,7 @@ export default function App() {
     chat.resetChat();
     chatHistory.startNewSession();
     setView('skill');
-  }, [chat, chatHistory]);
+  }, [chat.resetChat, chatHistory.startNewSession]);
 
   const openWorkflow = useCallback((workflowId) => {
     setActiveWorkflow(WORKFLOWS.find((w) => w.id === workflowId));
@@ -86,7 +86,7 @@ export default function App() {
       apiKeys: Object.fromEntries(Object.entries(apiKeys).filter(([_, v]) => v)),
     }, null, 2));
     goDashboard();
-  }, [brandStore]);
+  }, [brandStore.updateBrand]);
 
   // Send Message to Skill
   const handleSendMessage = useCallback(async (userMessage) => {
@@ -102,14 +102,14 @@ export default function App() {
     }
 
     return response;
-  }, [activeSkillId, brandStore, chat]);
+  }, [activeSkillId, brandStore.getBrandContext, brandStore.updateBrand, chat.sendMessage]);
 
   // Reset
   const handleReset = useCallback(() => {
     brandStore.resetBrand();
     chat.resetChat();
     setView('onboarding');
-  }, [brandStore, chat]);
+  }, [brandStore.resetBrand, chat.resetChat]);
 
   // Logout
   const handleLogout = useCallback(async () => {
