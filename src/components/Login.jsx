@@ -24,7 +24,7 @@ export default function Login() {
         await signInWithEmail(email, password);
       }
     } catch (err) {
-      setError(err.message);
+      setError(typeof err?.message === 'string' ? err.message : String(err));
     } finally {
       setLoading(false);
     }
@@ -39,7 +39,7 @@ export default function Login() {
         await signInWithGithub();
       }
     } catch (err) {
-      setError(err.message);
+      setError(typeof err?.message === 'string' ? err.message : String(err));
     }
   };
 

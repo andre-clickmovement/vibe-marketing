@@ -28,7 +28,10 @@ export function useChat() {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
-        throw new Error(errData.error || errData.details || `Request failed: ${res.status}`);
+        const errMsg = typeof errData?.error === 'string' ? errData.error
+          : typeof errData?.details === 'string' ? errData.details
+          : `Request failed: ${res.status}`;
+        throw new Error(errMsg);
       }
 
       const contentType = res.headers.get('content-type') || '';
@@ -85,11 +88,14 @@ export function useChat() {
       } else {
         // Non-streaming JSON response
         const data = await res.json();
-        const text =
-          data.content
-            ?.filter((c) => c.type === 'text')
-            .map((c) => c.text)
-            .join('\n') || 'No response generated.';
+        const text = (
+          Array.isArray(data?.content)
+            ? data.content
+                .filter((c) => c.type === 'text')
+                .map((c) => (typeof c.text === 'string' ? c.text : String(c.text ?? '')))
+                .join('\n')
+            : ''
+        ) || 'No response generated.';
 
         setMessages((prev) => [...prev, { role: 'assistant', content: text }]);
         return text;

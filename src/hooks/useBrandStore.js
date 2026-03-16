@@ -42,17 +42,19 @@ export function useBrandStore(userId = null) {
           }
 
           if (data) {
+            // Ensure all text fields are strings (Supabase JSONB columns may return objects)
+            const toString = (v) => (typeof v === 'string' ? v : v != null ? JSON.stringify(v) : null);
             setBrand({
-              voiceProfile: data.voice_profile,
-              positioning: data.positioning,
-              greatHooks: data.great_hooks,
-              audience: data.audience,
-              competitors: data.competitors,
-              creativeKit: data.creative_kit,
-              stack: data.stack,
-              keywordPlan: data.keyword_plan,
-              assets: data.assets || [],
-              learnings: data.learnings || [],
+              voiceProfile: toString(data.voice_profile),
+              positioning: toString(data.positioning),
+              greatHooks: toString(data.great_hooks),
+              audience: toString(data.audience),
+              competitors: toString(data.competitors),
+              creativeKit: toString(data.creative_kit),
+              stack: toString(data.stack),
+              keywordPlan: toString(data.keyword_plan),
+              assets: Array.isArray(data.assets) ? data.assets : [],
+              learnings: Array.isArray(data.learnings) ? data.learnings : [],
             });
           } else {
             setBrand(createEmptyBrand());
@@ -139,7 +141,11 @@ export function useBrandStore(userId = null) {
   }, [brand, loading, saveBrand]);
 
   const updateBrand = useCallback((key, value) => {
-    setBrand((prev) => ({ ...prev, [key]: value }));
+    // Ensure text brand fields are always strings (never objects)
+    const safeValue = (key !== 'assets' && key !== 'learnings' && typeof value === 'object' && value !== null)
+      ? JSON.stringify(value)
+      : value;
+    setBrand((prev) => ({ ...prev, [key]: safeValue }));
   }, []);
 
   const appendAsset = useCallback((asset) => {
