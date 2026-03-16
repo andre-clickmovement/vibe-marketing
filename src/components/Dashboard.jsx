@@ -297,9 +297,9 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           {user && (
             <div className="dash-user-info">
               <div className="dash-user-avatar">
-                {user.email?.[0]?.toUpperCase() || 'U'}
+                {typeof user.email === 'string' ? user.email[0]?.toUpperCase() : 'U'}
               </div>
-              <span>{user.email?.split('@')[0] || 'User'}</span>
+              <span>{typeof user.email === 'string' ? user.email.split('@')[0] : 'User'}</span>
             </div>
           )}
           <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>
