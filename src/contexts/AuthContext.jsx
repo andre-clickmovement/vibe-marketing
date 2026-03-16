@@ -8,7 +8,8 @@ export const useAuth = () => useContext(AuthContext);
 // Extract only safe primitive values from the Supabase user object
 const sanitizeUser = (rawUser) => {
   if (!rawUser) return null;
-  return {
+  console.log('Raw user from Supabase:', JSON.stringify(rawUser, null, 2));
+  const sanitized = {
     id: String(rawUser.id || ''),
     email: typeof rawUser.email === 'string' ? rawUser.email : '',
     name: typeof rawUser.user_metadata?.full_name === 'string'
@@ -17,6 +18,8 @@ const sanitizeUser = (rawUser) => {
         ? rawUser.user_metadata.name
         : '',
   };
+  console.log('Sanitized user:', sanitized);
+  return sanitized;
 };
 
 export function AuthProvider({ children }) {
