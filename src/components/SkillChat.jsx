@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { MarkdownHooks as ReactMarkdown } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { LAYER_META } from '../data/skills.js';
 
