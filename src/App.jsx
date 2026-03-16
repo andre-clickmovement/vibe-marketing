@@ -13,32 +13,19 @@ import { WORKFLOWS, getSkillById } from './data/skills.js';
 import { buildSystemPrompt } from './data/prompts.js';
 
 export default function App() {
-  const auth = useAuth();
-  const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = auth;
-
-  // === DIAGNOSTIC: Check every auth value ===
-  console.log('[App] useAuth() keys & types:', Object.entries(auth).map(([k, v]) => `${k}:${typeof v}`).join(', '));
-  if (user) console.log('[App] user value:', JSON.stringify(user));
-
+  const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = useAuth();
   const [view, setView] = useState('splash');
   const [activeSkillId, setActiveSkillId] = useState(null);
   const [activeWorkflow, setActiveWorkflow] = useState(null);
 
-  // Pass userId to brandStore for Supabase persistence
-  // Ensure userId is always a string or null
   const userId = user?.id ? String(user.id) : null;
   const brandStore = useBrandStore(userId);
   const chat = useChat();
   const chatHistory = useChatHistory(userId, activeSkillId);
 
-  // === DIAGNOSTIC: Check all hook return values ===
-  console.log('[App] state:', { view, authLoading, isAuthenticated, isConfigured, activeSkillId });
-  console.log('[App] brandStore.brand types:', Object.entries(brandStore.brand).map(([k, v]) => `${k}:${typeof v}`).join(', '));
-
   // Load chat history when opening a skill
   useEffect(() => {
     if (chatHistory.currentMessages.length > 0 && chat.messages.length === 0) {
-      // Restore messages from history
       chat.setMessages?.(chatHistory.currentMessages);
     }
   }, [chatHistory.currentMessages]);
@@ -50,7 +37,64 @@ export default function App() {
     }
   }, [chat.messages, activeSkillId]);
 
-  // Show loading state while auth initializes
+  // Navigation helpers
+  const goSplash = useCallback(() => setView('splash'), []);
+  const goOnboarding = useCallback(() => setView('onboarding'), []);
+  const goDashboard = useCallback(() => setView('dashboard'), []);
+
+  const openSkill = useCallback((skillId) => {
+    setActiveSkillId(skillId);
+    chat.resetChat();
+    chatHistory.startNewSession();
+    setView('skill');
+  }, [chat.resetChat, chatHistory.startNewSession]);
+
+  const openWorkflow = useCallback((workflowId) => {
+    setActiveWorkflow(WORKFLOWS.find((w) => w.id === workflowId));
+    setView('workflow');
+  }, []);
+
+  const handleOnboardingComplete = useCallback(({ businessDesc, businessUrl, selectedGoal, apiKeys }) => {
+    brandStore.updateBrand('stack', JSON.stringify({
+      businessDesc,
+      businessUrl,
+      goal: selectedGoal,
+      apiKeys: Object.fromEntries(Object.entries(apiKeys).filter(([_, v]) => v)),
+    }, null, 2));
+    setView('dashboard');
+  }, [brandStore.updateBrand]);
+
+  const handleSendMessage = useCallback(async (userMessage) => {
+    if (!activeSkillId) return;
+
+    const systemPrompt = buildSystemPrompt(activeSkillId, brandStore.getBrandContext());
+    const response = await chat.sendMessage(userMessage, systemPrompt);
+
+    const skill = getSkillById(activeSkillId);
+    if (skill?.brandKey && response && !response.startsWith('Error:')) {
+      brandStore.updateBrand(skill.brandKey, response);
+    }
+
+    return response;
+  }, [activeSkillId, brandStore.getBrandContext, brandStore.updateBrand, chat.sendMessage]);
+
+  const handleReset = useCallback(() => {
+    brandStore.resetBrand();
+    chat.resetChat();
+    setView('onboarding');
+  }, [brandStore.resetBrand, chat.resetChat]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await signOut();
+      setView('splash');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  }, [signOut]);
+
+  // === Early returns AFTER all hooks ===
+
   if (authLoading) {
     return (
       <div style={{
@@ -65,71 +109,9 @@ export default function App() {
     );
   }
 
-  // Show login if Supabase is configured but user isn't authenticated
   if (isConfigured && !isAuthenticated) {
     return <Login />;
   }
-
-  // Navigation helpers
-  const goSplash = () => setView('splash');
-  const goOnboarding = () => setView('onboarding');
-  const goDashboard = () => setView('dashboard');
-
-  const openSkill = useCallback((skillId) => {
-    setActiveSkillId(skillId);
-    chat.resetChat();
-    chatHistory.startNewSession();
-    setView('skill');
-  }, [chat.resetChat, chatHistory.startNewSession]);
-
-  const openWorkflow = useCallback((workflowId) => {
-    setActiveWorkflow(WORKFLOWS.find((w) => w.id === workflowId));
-    setView('workflow');
-  }, []);
-
-  // Onboarding Complete
-  const handleOnboardingComplete = useCallback(({ businessDesc, businessUrl, selectedGoal, apiKeys }) => {
-    brandStore.updateBrand('stack', JSON.stringify({
-      businessDesc,
-      businessUrl,
-      goal: selectedGoal,
-      apiKeys: Object.fromEntries(Object.entries(apiKeys).filter(([_, v]) => v)),
-    }, null, 2));
-    goDashboard();
-  }, [brandStore.updateBrand]);
-
-  // Send Message to Skill
-  const handleSendMessage = useCallback(async (userMessage) => {
-    if (!activeSkillId) return;
-
-    const systemPrompt = buildSystemPrompt(activeSkillId, brandStore.getBrandContext());
-    const response = await chat.sendMessage(userMessage, systemPrompt);
-
-    // Auto-save foundation skill outputs to brand memory
-    const skill = getSkillById(activeSkillId);
-    if (skill?.brandKey && response && !response.startsWith('Error:')) {
-      brandStore.updateBrand(skill.brandKey, response);
-    }
-
-    return response;
-  }, [activeSkillId, brandStore.getBrandContext, brandStore.updateBrand, chat.sendMessage]);
-
-  // Reset
-  const handleReset = useCallback(() => {
-    brandStore.resetBrand();
-    chat.resetChat();
-    setView('onboarding');
-  }, [brandStore.resetBrand, chat.resetChat]);
-
-  // Logout
-  const handleLogout = useCallback(async () => {
-    try {
-      await signOut();
-      setView('splash');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-  }, [signOut]);
 
   // Render
   const activeSkill = activeSkillId ? getSkillById(activeSkillId) : null;
@@ -157,7 +139,7 @@ export default function App() {
       );
 
     case 'skill':
-      if (!activeSkill) { goDashboard(); return null; }
+      if (!activeSkill) { setView('dashboard'); return null; }
       return (
         <SkillChat
           skill={activeSkill}
@@ -170,7 +152,7 @@ export default function App() {
       );
 
     case 'workflow':
-      if (!activeWorkflow) { goDashboard(); return null; }
+      if (!activeWorkflow) { setView('dashboard'); return null; }
       return (
         <WorkflowView
           workflow={activeWorkflow}

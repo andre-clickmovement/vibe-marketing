@@ -134,13 +134,6 @@ export function AuthProvider({ children }) {
     signOut,
   };
 
-  // === DIAGNOSTIC ===
-  console.log('[AuthProvider] render —', {
-    userId, userEmail, userName, loading,
-    userType: typeof user, userValue: user,
-    isAuthenticated: !!userId, isConfigured: isSupabaseConfigured(),
-  });
-
   return (
     <AuthContext.Provider value={value}>
       {children}
