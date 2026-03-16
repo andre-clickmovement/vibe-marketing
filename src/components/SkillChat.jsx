@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { LAYER_META } from '../data/skills.js';
 
 export default function SkillChat({ skill, messages, isStreaming, onSend, onStop, onBack }) {
@@ -289,7 +288,7 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
                 <div className="chat-msg-user">{msg.content}</div>
               ) : (
                 <div className="chat-msg-assistant markdown-content">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
               )}
             </div>
