@@ -1,6 +1,42 @@
 import { useState, useRef, useEffect } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { LAYER_META } from '../data/skills.js';
+
+// Simple markdown renderer — avoids react-markdown + unified pipeline
+// which causes React error #310 with hast-util-to-jsx-runtime
+function SimpleMarkdown({ children }) {
+  if (typeof children !== 'string') return null;
+
+  const html = children
+    // Code blocks
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Strikethrough
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+    // Headers
+    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    // Horizontal rule
+    .replace(/^---$/gm, '<hr />')
+    // Unordered lists
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    // Ordered lists
+    .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+    // Links
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    // Paragraphs (double newline)
+    .replace(/\n\n/g, '</p><p>')
+    // Single newlines
+    .replace(/\n/g, '<br />');
+
+  return <div dangerouslySetInnerHTML={{ __html: `<p>${html}</p>` }} />;
+}
 
 export default function SkillChat({ skill, messages, isStreaming, onSend, onStop, onBack }) {
   const [input, setInput] = useState('');
@@ -288,7 +324,7 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
                 <div className="chat-msg-user">{msg.content}</div>
               ) : (
                 <div className="chat-msg-assistant markdown-content">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  <SimpleMarkdown>{msg.content}</SimpleMarkdown>
                 </div>
               )}
             </div>
