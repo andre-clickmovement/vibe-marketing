@@ -5,9 +5,27 @@ const AuthContext = createContext({});
 
 export const useAuth = () => useContext(AuthContext);
 
+// Extract only safe primitive values from the Supabase user object
+const sanitizeUser = (rawUser) => {
+  if (!rawUser) return null;
+  return {
+    id: String(rawUser.id || ''),
+    email: typeof rawUser.email === 'string' ? rawUser.email : '',
+    name: typeof rawUser.user_metadata?.full_name === 'string'
+      ? rawUser.user_metadata.full_name
+      : typeof rawUser.user_metadata?.name === 'string'
+        ? rawUser.user_metadata.name
+        : '',
+  };
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const updateUser = (rawUser) => {
+    setUser(sanitizeUser(rawUser));
+  };
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -22,7 +40,7 @@ export function AuthProvider({ children }) {
         if (error) {
           console.error('Error getting session:', error);
         }
-        setUser(session?.user ?? null);
+        updateUser(session?.user);
       } catch (err) {
         console.error('Session error:', err);
       } finally {
