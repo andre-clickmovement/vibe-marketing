@@ -176,20 +176,35 @@ export function useBrandStore(userId = null) {
 
   const getBrandContext = useCallback(() => {
     const parts = [];
-    if (brand.voiceProfile) parts.push(`## Voice Profile\n${brand.voiceProfile}`);
-    if (brand.positioning) parts.push(`## Positioning\n${brand.positioning}`);
-    if (brand.greatHooks) parts.push(`## Great Hooks\n${brand.greatHooks}`);
-    if (brand.keywordPlan) parts.push(`## Keyword Plan\n${brand.keywordPlan}`);
-    if (brand.stack) parts.push(`## Business Info\n${brand.stack}`);
-    if (brand.learnings.length > 0) {
+    if (typeof brand.voiceProfile === 'string' && brand.voiceProfile) {
+      parts.push(`## Voice Profile\n${brand.voiceProfile}`);
+    }
+    if (typeof brand.positioning === 'string' && brand.positioning) {
+      parts.push(`## Positioning\n${brand.positioning}`);
+    }
+    if (typeof brand.greatHooks === 'string' && brand.greatHooks) {
+      parts.push(`## Great Hooks\n${brand.greatHooks}`);
+    }
+    if (typeof brand.keywordPlan === 'string' && brand.keywordPlan) {
+      parts.push(`## Keyword Plan\n${brand.keywordPlan}`);
+    }
+    if (typeof brand.stack === 'string' && brand.stack) {
+      parts.push(`## Business Info\n${brand.stack}`);
+    }
+    if (Array.isArray(brand.learnings) && brand.learnings.length > 0) {
       parts.push(
-        `## Learnings\n${brand.learnings.map((l) => `- ${l.text}`).join('\n')}`
+        `## Learnings\n${brand.learnings.map((l) => `- ${typeof l?.text === 'string' ? l.text : ''}`).join('\n')}`
       );
     }
     return parts.join('\n\n') || '';
   }, [brand]);
 
-  const foundationComplete = [brand.voiceProfile, brand.positioning, brand.greatHooks].filter(Boolean).length;
+  // Safely check foundation completion
+  const foundationComplete = [
+    typeof brand.voiceProfile === 'string' && brand.voiceProfile,
+    typeof brand.positioning === 'string' && brand.positioning,
+    typeof brand.greatHooks === 'string' && brand.greatHooks,
+  ].filter(Boolean).length;
 
   return {
     brand,
