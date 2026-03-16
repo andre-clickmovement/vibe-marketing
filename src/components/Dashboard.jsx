@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { SKILLS, WORKFLOWS, LAYER_META, getSkillById } from '../data/skills.js';
 
-export default function Dashboard({ brand, foundationComplete, foundationTotal, onOpenSkill, onOpenWorkflow, onReset, onSettings }) {
+export default function Dashboard({ brand, foundationComplete, foundationTotal, onOpenSkill, onOpenWorkflow, onReset, onLogout, user, syncing }) {
   const [showSettings, setShowSettings] = useState(false);
 
   return (
@@ -44,6 +44,49 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           font-size: 13px;
         }
         .dash-settings-btn:hover { background: var(--bg-elevated); }
+        .dash-nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .dash-user-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 12px;
+          background: var(--bg-elevated);
+          border-radius: 6px;
+          font-size: 13px;
+          color: var(--text-secondary);
+        }
+        .dash-user-avatar {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: var(--gold-dim);
+          color: var(--gold);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+          font-weight: 600;
+        }
+        .dash-sync-indicator {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--teal);
+          animation: pulse 1.5s ease infinite;
+        }
+        .dash-logout-btn {
+          padding: 6px 12px;
+          background: transparent;
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          color: var(--text-muted);
+          font-size: 12px;
+        }
+        .dash-logout-btn:hover { border-color: var(--red); color: var(--red); }
         .dash-body {
           max-width: 1080px;
           margin: 0 auto;
@@ -249,9 +292,25 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           />
           <div className="dash-nav-sub">Marketing Skills</div>
         </div>
-        <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>
-          Settings
-        </button>
+        <div className="dash-nav-actions">
+          {syncing && <div className="dash-sync-indicator" title="Syncing..." />}
+          {user && (
+            <div className="dash-user-info">
+              <div className="dash-user-avatar">
+                {user.email?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <span>{user.email?.split('@')[0] || 'User'}</span>
+            </div>
+          )}
+          <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>
+            Settings
+          </button>
+          {onLogout && (
+            <button className="dash-logout-btn" onClick={onLogout}>
+              Logout
+            </button>
+          )}
+        </div>
       </nav>
 
       <div className="dash-body">

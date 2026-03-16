@@ -118,5 +118,5 @@ export function useChat() {
     if (abortRef.current) abortRef.current.abort();
   }, []);
 
-  return { messages, isStreaming, sendMessage, stopStreaming, resetChat };
+  return { messages, setMessages, isStreaming, sendMessage, stopStreaming, resetChat };
 }

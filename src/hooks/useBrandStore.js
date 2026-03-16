@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 
 const STORAGE_KEY = 'vibe-brand-state';
 
@@ -15,24 +16,127 @@ const createEmptyBrand = () => ({
   learnings: [],
 });
 
-export function useBrandStore() {
-  const [brand, setBrand] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : createEmptyBrand();
-    } catch {
-      return createEmptyBrand();
-    }
-  });
+export function useBrandStore(userId = null) {
+  const [brand, setBrand] = useState(createEmptyBrand);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const saveTimeoutRef = useRef(null);
 
-  // Persist on change
+  // Load brand data on mount or when userId changes
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(brand));
-    } catch {
-      // localStorage might be full or unavailable
+    const loadBrand = async () => {
+      setLoading(true);
+
+      if (userId && isSupabaseConfigured()) {
+        // Load from Supabase
+        try {
+          const { data, error } = await supabase
+            .from('brand_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .single();
+
+          if (error && error.code !== 'PGRST116') {
+            // PGRST116 = no rows returned
+            console.error('Error loading brand:', error);
+          }
+
+          if (data) {
+            setBrand({
+              voiceProfile: data.voice_profile,
+              positioning: data.positioning,
+              greatHooks: data.great_hooks,
+              audience: data.audience,
+              competitors: data.competitors,
+              creativeKit: data.creative_kit,
+              stack: data.stack,
+              keywordPlan: data.keyword_plan,
+              assets: data.assets || [],
+              learnings: data.learnings || [],
+            });
+          } else {
+            setBrand(createEmptyBrand());
+          }
+        } catch (err) {
+          console.error('Error loading brand:', err);
+          setBrand(createEmptyBrand());
+        }
+      } else {
+        // Fall back to localStorage
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          setBrand(stored ? JSON.parse(stored) : createEmptyBrand());
+        } catch {
+          setBrand(createEmptyBrand());
+        }
+      }
+
+      setLoading(false);
+    };
+
+    loadBrand();
+  }, [userId]);
+
+  // Debounced save to Supabase
+  const saveBrand = useCallback(
+    async (newBrand) => {
+      if (!userId || !isSupabaseConfigured()) {
+        // Save to localStorage
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(newBrand));
+        } catch {
+          // localStorage might be full
+        }
+        return;
+      }
+
+      // Debounce Supabase saves
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      saveTimeoutRef.current = setTimeout(async () => {
+        setSyncing(true);
+        try {
+          const { error } = await supabase.from('brand_profiles').upsert(
+            {
+              user_id: userId,
+              voice_profile: newBrand.voiceProfile,
+              positioning: newBrand.positioning,
+              great_hooks: newBrand.greatHooks,
+              audience: newBrand.audience,
+              competitors: newBrand.competitors,
+              creative_kit: newBrand.creativeKit,
+              stack: newBrand.stack,
+              keyword_plan: newBrand.keywordPlan,
+              assets: newBrand.assets,
+              learnings: newBrand.learnings,
+              updated_at: new Date().toISOString(),
+            },
+            {
+              onConflict: 'user_id',
+            }
+          );
+
+          if (error) {
+            console.error('Error saving brand:', error);
+          }
+        } catch (err) {
+          console.error('Error saving brand:', err);
+        } finally {
+          setSyncing(false);
+        }
+      }, 1000); // Debounce 1 second
+    },
+    [userId]
+  );
+
+  // Auto-save on brand changes
+  useEffect(() => {
+    if (!loading) {
+      saveBrand(brand);
     }
-  }, [brand]);
+  }, [brand, loading, saveBrand]);
 
   const updateBrand = useCallback((key, value) => {
     setBrand((prev) => ({ ...prev, [key]: value }));
@@ -52,14 +156,23 @@ export function useBrandStore() {
     }));
   }, []);
 
-  const resetBrand = useCallback(() => {
+  const resetBrand = useCallback(async () => {
     setBrand(createEmptyBrand());
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // no-op
+
+    if (userId && isSupabaseConfigured()) {
+      try {
+        await supabase.from('brand_profiles').delete().eq('user_id', userId);
+      } catch (err) {
+        console.error('Error deleting brand:', err);
+      }
+    } else {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // no-op
+      }
     }
-  }, []);
+  }, [userId]);
 
   const getBrandContext = useCallback(() => {
     const parts = [];
@@ -88,5 +201,7 @@ export function useBrandStore() {
     getBrandContext,
     foundationComplete,
     foundationTotal: 3,
+    loading,
+    syncing,
   };
 }
