@@ -13,7 +13,13 @@ import { WORKFLOWS, getSkillById } from './data/skills.js';
 import { buildSystemPrompt } from './data/prompts.js';
 
 export default function App() {
-  const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = useAuth();
+  const auth = useAuth();
+  const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = auth;
+
+  // === DIAGNOSTIC: Check every auth value ===
+  console.log('[App] useAuth() keys & types:', Object.entries(auth).map(([k, v]) => `${k}:${typeof v}`).join(', '));
+  if (user) console.log('[App] user value:', JSON.stringify(user));
+
   const [view, setView] = useState('splash');
   const [activeSkillId, setActiveSkillId] = useState(null);
   const [activeWorkflow, setActiveWorkflow] = useState(null);
@@ -24,6 +30,10 @@ export default function App() {
   const brandStore = useBrandStore(userId);
   const chat = useChat();
   const chatHistory = useChatHistory(userId, activeSkillId);
+
+  // === DIAGNOSTIC: Check all hook return values ===
+  console.log('[App] state:', { view, authLoading, isAuthenticated, isConfigured, activeSkillId });
+  console.log('[App] brandStore.brand types:', Object.entries(brandStore.brand).map(([k, v]) => `${k}:${typeof v}`).join(', '));
 
   // Load chat history when opening a skill
   useEffect(() => {
