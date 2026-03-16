@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component {
           <div style={{ textAlign: 'center', maxWidth: 400 }}>
             <h1 style={{ fontSize: 24, marginBottom: 16 }}>Something went wrong</h1>
             <p style={{ color: '#a1a1aa', marginBottom: 24 }}>
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {typeof this.state.error?.message === 'string' ? this.state.error.message : 'An unexpected error occurred'}
             </p>
             <button
               onClick={() => window.location.reload()}
