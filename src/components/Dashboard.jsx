@@ -1,8 +1,27 @@
 import { useState } from 'react';
 import { SKILLS, WORKFLOWS, LAYER_META, getSkillById } from '../data/skills.js';
 
+// Safely extract user display info
+const getUserDisplay = (user) => {
+  if (!user) return null;
+  const email = user.email;
+  if (typeof email === 'string' && email) {
+    return {
+      initial: email[0].toUpperCase(),
+      name: email.split('@')[0],
+    };
+  }
+  // Fallback for other auth providers
+  const name = user.user_metadata?.full_name || user.user_metadata?.name || 'User';
+  return {
+    initial: typeof name === 'string' ? name[0].toUpperCase() : 'U',
+    name: typeof name === 'string' ? name : 'User',
+  };
+};
+
 export default function Dashboard({ brand, foundationComplete, foundationTotal, onOpenSkill, onOpenWorkflow, onReset, onLogout, user, syncing }) {
   const [showSettings, setShowSettings] = useState(false);
+  const userDisplay = getUserDisplay(user);
 
   return (
     <div className="dash-root">
@@ -294,12 +313,12 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         </div>
         <div className="dash-nav-actions">
           {syncing && <div className="dash-sync-indicator" title="Syncing..." />}
-          {user && (
+          {userDisplay && (
             <div className="dash-user-info">
               <div className="dash-user-avatar">
-                {typeof user.email === 'string' ? user.email[0]?.toUpperCase() : 'U'}
+                {userDisplay.initial}
               </div>
-              <span>{typeof user.email === 'string' ? user.email.split('@')[0] : 'User'}</span>
+              <span>{userDisplay.name}</span>
             </div>
           )}
           <button className="dash-settings-btn" onClick={() => setShowSettings(!showSettings)}>

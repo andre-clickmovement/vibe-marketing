@@ -19,9 +19,11 @@ export default function App() {
   const [activeWorkflow, setActiveWorkflow] = useState(null);
 
   // Pass userId to brandStore for Supabase persistence
-  const brandStore = useBrandStore(user?.id);
+  // Ensure userId is always a string or null
+  const userId = user?.id ? String(user.id) : null;
+  const brandStore = useBrandStore(userId);
   const chat = useChat();
-  const chatHistory = useChatHistory(user?.id, activeSkillId);
+  const chatHistory = useChatHistory(userId, activeSkillId);
 
   // Load chat history when opening a skill
   useEffect(() => {
