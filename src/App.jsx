@@ -6,10 +6,12 @@ import Onboarding from './components/Onboarding.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import SkillChat from './components/SkillChat.jsx';
 import WorkflowView from './components/WorkflowView.jsx';
+import DocumentView from './components/DocumentView.jsx';
 import MainContent from './components/layout/MainContent.jsx';
 import { useBrandStore } from './hooks/useBrandStore.js';
 import { useChat } from './hooks/useChat.js';
 import { useChatHistory } from './hooks/useChatHistory.js';
+import { useDocuments } from './hooks/useDocuments.js';
 import { WORKFLOWS, getSkillById } from './data/skills.js';
 import { buildSystemPrompt } from './data/prompts.js';
 
@@ -18,6 +20,7 @@ export default function App() {
   const [view, setView] = useState('splash');
   const [activeSkillId, setActiveSkillId] = useState(null);
   const [activeWorkflowId, setActiveWorkflowId] = useState(null);
+  const [activeDocumentId, setActiveDocumentId] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
 
   // Pass userId to brandStore for Supabase persistence
@@ -25,6 +28,7 @@ export default function App() {
   const brandStore = useBrandStore(userId);
   const chat = useChat();
   const chatHistory = useChatHistory(userId, activeSkillId);
+  const { documents, createDocument, updateDocument, deleteDocument, getDocument } = useDocuments(userId);
 
   // Load chat history when opening a skill
   useEffect(() => {
@@ -49,6 +53,7 @@ export default function App() {
   const handleSelectSkill = useCallback((skillId) => {
     setActiveSkillId(skillId);
     setActiveWorkflowId(null);
+    setActiveDocumentId(null);
     chat.resetChat();
     chatHistory.startNewSession();
   }, [chat, chatHistory]);
@@ -57,12 +62,21 @@ export default function App() {
   const handleSelectWorkflow = useCallback((workflowId) => {
     setActiveWorkflowId(workflowId);
     setActiveSkillId(null);
+    setActiveDocumentId(null);
   }, []);
 
-  // Go back to overview (deselect skill/workflow)
+  // Select document from sidebar
+  const handleSelectDocument = useCallback((docId) => {
+    setActiveDocumentId(docId);
+    setActiveSkillId(null);
+    setActiveWorkflowId(null);
+  }, []);
+
+  // Go back to overview (deselect skill/workflow/document)
   const handleBackToOverview = useCallback(() => {
     setActiveSkillId(null);
     setActiveWorkflowId(null);
+    setActiveDocumentId(null);
   }, []);
 
   // Onboarding Complete
@@ -129,9 +143,10 @@ export default function App() {
     return <Login />;
   }
 
-  // Get active skill/workflow objects
+  // Get active skill/workflow/document objects
   const activeSkill = activeSkillId ? getSkillById(activeSkillId) : null;
   const activeWorkflow = activeWorkflowId ? WORKFLOWS.find(w => w.id === activeWorkflowId) : null;
+  const activeDocument = activeDocumentId ? getDocument(activeDocumentId) : null;
 
   // Render based on view
   switch (view) {
@@ -147,10 +162,11 @@ export default function App() {
         <AppLayout
           activeSkillId={activeSkillId}
           activeWorkflowId={activeWorkflowId}
+          activeDocumentId={activeDocumentId}
           onSelectSkill={handleSelectSkill}
           onSelectWorkflow={handleSelectWorkflow}
-          documents={[]} // TODO: Load from database
-          onSelectDocument={() => {}} // TODO: Implement
+          documents={documents}
+          onSelectDocument={handleSelectDocument}
           brand={brandStore.brand}
           user={user}
           syncing={brandStore.syncing}
@@ -166,12 +182,20 @@ export default function App() {
               onSend={handleSendMessage}
               onStop={chat.stopStreaming}
               onBack={handleBackToOverview}
+              onSaveDocument={createDocument}
             />
           ) : activeWorkflow ? (
             <WorkflowView
               workflow={activeWorkflow}
               onOpenSkill={handleSelectSkill}
               onBack={handleBackToOverview}
+            />
+          ) : activeDocument ? (
+            <DocumentView
+              document={activeDocument}
+              onBack={handleBackToOverview}
+              onUpdate={updateDocument}
+              onDelete={deleteDocument}
             />
           ) : (
             <MainContent

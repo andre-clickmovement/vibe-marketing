@@ -5,6 +5,7 @@ export default function AppLayout({
   children,
   activeSkillId,
   activeWorkflowId,
+  activeDocumentId,
   onSelectSkill,
   onSelectWorkflow,
   documents = [],
@@ -104,6 +105,7 @@ export default function AppLayout({
       <Sidebar
         activeSkillId={activeSkillId}
         activeWorkflowId={activeWorkflowId}
+        activeDocumentId={activeDocumentId}
         onSelectSkill={onSelectSkill}
         onSelectWorkflow={onSelectWorkflow}
         documents={documents}

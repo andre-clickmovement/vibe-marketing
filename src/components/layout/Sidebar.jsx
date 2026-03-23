@@ -16,6 +16,7 @@ const getSkillsByLayer = () => {
 export default function Sidebar({
   activeSkillId,
   activeWorkflowId,
+  activeDocumentId,
   onSelectSkill,
   onSelectWorkflow,
   documents = [],
@@ -313,37 +314,44 @@ export default function Sidebar({
         </div>
 
         {/* Documents Section */}
-        {documents.length > 0 && (
-          <>
-            <div className="sidebar-divider" />
-            <div className="sidebar-section">
-              <div
-                className="sidebar-section-header"
-                onClick={() => toggleSection('documents')}
-              >
-                <div className="sidebar-section-dot" style={{ background: '#10b981' }} />
-                <span className="sidebar-section-label">Documents</span>
-                <span className={`sidebar-section-chevron ${expandedSections.documents ? 'sidebar-section-chevron--open' : ''}`}>
-                  ▶
-                </span>
-              </div>
-              {expandedSections.documents && (
-                <div className="sidebar-section-items">
-                  {documents.map(doc => (
+        <div className="sidebar-divider" />
+        <div className="sidebar-section">
+          <div
+            className="sidebar-section-header"
+            onClick={() => toggleSection('documents')}
+          >
+            <div className="sidebar-section-dot" style={{ background: '#10b981' }} />
+            <span className="sidebar-section-label">Documents ({documents.length})</span>
+            <span className={`sidebar-section-chevron ${expandedSections.documents ? 'sidebar-section-chevron--open' : ''}`}>
+              ▶
+            </span>
+          </div>
+          {expandedSections.documents && (
+            <div className="sidebar-section-items">
+              {documents.length === 0 ? (
+                <div className="sidebar-item" style={{ cursor: 'default', opacity: 0.6 }}>
+                  <span className="sidebar-item-name" style={{ fontStyle: 'italic' }}>
+                    No saved documents yet
+                  </span>
+                </div>
+              ) : (
+                documents.map(doc => {
+                  const isActive = activeDocumentId === doc.id;
+                  return (
                     <button
                       key={doc.id}
-                      className="sidebar-item"
+                      className={`sidebar-item ${isActive ? 'sidebar-item--active' : ''}`}
                       onClick={() => onSelectDocument(doc.id)}
                     >
-                      <div className="sidebar-item-indicator sidebar-item-indicator--complete" />
+                      <div className={`sidebar-item-indicator sidebar-item-indicator--complete ${isActive ? 'sidebar-item-indicator--active' : ''}`} />
                       <span className="sidebar-item-name">{doc.title}</span>
                     </button>
-                  ))}
-                </div>
+                  );
+                })
               )}
             </div>
-          </>
-        )}
+          )}
+        </div>
       </div>
     </aside>
   );

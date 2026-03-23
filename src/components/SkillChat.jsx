@@ -38,10 +38,31 @@ function SimpleMarkdown({ children }) {
   return <div dangerouslySetInnerHTML={{ __html: `<p>${html}</p>` }} />;
 }
 
-export default function SkillChat({ skill, messages, isStreaming, onSend, onStop, onBack }) {
+export default function SkillChat({ skill, messages, isStreaming, onSend, onStop, onBack, onSaveDocument }) {
   const [input, setInput] = useState('');
+  const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'saved'
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Get the last assistant message for saving
+  const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
+
+  const handleSaveDocument = async () => {
+    if (!lastAssistantMessage || !onSaveDocument) return;
+    setSaveStatus('saving');
+    try {
+      await onSaveDocument({
+        title: `${skill.name} - ${new Date().toLocaleDateString()}`,
+        content: lastAssistantMessage.content,
+        skillId: skill.id,
+      });
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Error saving document:', err);
+      setSaveStatus(null);
+    }
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -260,6 +281,36 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           white-space: nowrap;
         }
         .chat-stop:hover { background: rgba(255,107,107,0.1); }
+        .chat-actions {
+          display: flex;
+          gap: 8px;
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid var(--border);
+        }
+        .chat-save-btn {
+          padding: 8px 14px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          color: var(--text-secondary);
+          font-size: 12px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .chat-save-btn:hover:not(:disabled) {
+          border-color: var(--teal);
+          color: var(--teal);
+        }
+        .chat-save-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .chat-save-btn--saved {
+          border-color: var(--teal);
+          color: var(--teal);
+        }
       `}</style>
 
       {/* Header */}
@@ -325,6 +376,18 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
               ) : (
                 <div className="chat-msg-assistant markdown-content">
                   <SimpleMarkdown>{msg.content}</SimpleMarkdown>
+                  {/* Show save button on the last assistant message */}
+                  {onSaveDocument && msg === lastAssistantMessage && !isStreaming && (
+                    <div className="chat-actions">
+                      <button
+                        className={`chat-save-btn ${saveStatus === 'saved' ? 'chat-save-btn--saved' : ''}`}
+                        onClick={handleSaveDocument}
+                        disabled={saveStatus === 'saving'}
+                      >
+                        {saveStatus === 'saving' ? 'Saving...' : saveStatus === 'saved' ? 'Saved!' : 'Save to Documents'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
