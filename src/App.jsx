@@ -3,9 +3,10 @@ import { useAuth } from './contexts/AuthContext.jsx';
 import Login from './components/Login.jsx';
 import Splash from './components/Splash.jsx';
 import Onboarding from './components/Onboarding.jsx';
-import Dashboard from './components/Dashboard.jsx';
+import AppLayout from './components/layout/AppLayout.jsx';
 import SkillChat from './components/SkillChat.jsx';
 import WorkflowView from './components/WorkflowView.jsx';
+import MainContent from './components/layout/MainContent.jsx';
 import { useBrandStore } from './hooks/useBrandStore.js';
 import { useChat } from './hooks/useChat.js';
 import { useChatHistory } from './hooks/useChatHistory.js';
@@ -16,8 +17,10 @@ export default function App() {
   const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = useAuth();
   const [view, setView] = useState('splash');
   const [activeSkillId, setActiveSkillId] = useState(null);
-  const [activeWorkflow, setActiveWorkflow] = useState(null);
+  const [activeWorkflowId, setActiveWorkflowId] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
+  // Pass userId to brandStore for Supabase persistence
   const userId = user?.id ? String(user.id) : null;
   const brandStore = useBrandStore(userId);
   const chat = useChat();
@@ -28,32 +31,41 @@ export default function App() {
     if (chatHistory.currentMessages.length > 0 && chat.messages.length === 0) {
       chat.setMessages?.(chatHistory.currentMessages);
     }
-  }, [chatHistory.currentMessages]);
+  }, [chatHistory.currentMessages, chat.messages.length, chat.setMessages]);
 
   // Save chat history when messages change
   useEffect(() => {
     if (chat.messages.length > 0 && activeSkillId) {
       chatHistory.saveSession(chat.messages);
     }
-  }, [chat.messages, activeSkillId]);
+  }, [chat.messages, activeSkillId, chatHistory]);
 
   // Navigation helpers
   const goSplash = useCallback(() => setView('splash'), []);
   const goOnboarding = useCallback(() => setView('onboarding'), []);
-  const goDashboard = useCallback(() => setView('dashboard'), []);
+  const goApp = useCallback(() => setView('app'), []);
 
-  const openSkill = useCallback((skillId) => {
+  // Select skill from sidebar
+  const handleSelectSkill = useCallback((skillId) => {
     setActiveSkillId(skillId);
+    setActiveWorkflowId(null);
     chat.resetChat();
     chatHistory.startNewSession();
-    setView('skill');
-  }, [chat.resetChat, chatHistory.startNewSession]);
+  }, [chat, chatHistory]);
 
-  const openWorkflow = useCallback((workflowId) => {
-    setActiveWorkflow(WORKFLOWS.find((w) => w.id === workflowId));
-    setView('workflow');
+  // Select workflow from sidebar
+  const handleSelectWorkflow = useCallback((workflowId) => {
+    setActiveWorkflowId(workflowId);
+    setActiveSkillId(null);
   }, []);
 
+  // Go back to overview (deselect skill/workflow)
+  const handleBackToOverview = useCallback(() => {
+    setActiveSkillId(null);
+    setActiveWorkflowId(null);
+  }, []);
+
+  // Onboarding Complete
   const handleOnboardingComplete = useCallback(({ businessDesc, businessUrl, selectedGoal, apiKeys }) => {
     brandStore.updateBrand('stack', JSON.stringify({
       businessDesc,
@@ -61,29 +73,33 @@ export default function App() {
       goal: selectedGoal,
       apiKeys: Object.fromEntries(Object.entries(apiKeys).filter(([_, v]) => v)),
     }, null, 2));
-    setView('dashboard');
-  }, [brandStore.updateBrand]);
+    goApp();
+  }, [brandStore, goApp]);
 
+  // Send Message to Skill
   const handleSendMessage = useCallback(async (userMessage) => {
     if (!activeSkillId) return;
 
     const systemPrompt = buildSystemPrompt(activeSkillId, brandStore.getBrandContext());
     const response = await chat.sendMessage(userMessage, systemPrompt);
 
+    // Auto-save foundation skill outputs to brand memory
     const skill = getSkillById(activeSkillId);
     if (skill?.brandKey && response && !response.startsWith('Error:')) {
       brandStore.updateBrand(skill.brandKey, response);
     }
 
     return response;
-  }, [activeSkillId, brandStore.getBrandContext, brandStore.updateBrand, chat.sendMessage]);
+  }, [activeSkillId, brandStore, chat]);
 
+  // Reset
   const handleReset = useCallback(() => {
     brandStore.resetBrand();
     chat.resetChat();
     setView('onboarding');
-  }, [brandStore.resetBrand, chat.resetChat]);
+  }, [brandStore, chat]);
 
+  // Logout
   const handleLogout = useCallback(async () => {
     try {
       await signOut();
@@ -113,55 +129,58 @@ export default function App() {
     return <Login />;
   }
 
-  // Render
+  // Get active skill/workflow objects
   const activeSkill = activeSkillId ? getSkillById(activeSkillId) : null;
+  const activeWorkflow = activeWorkflowId ? WORKFLOWS.find(w => w.id === activeWorkflowId) : null;
 
+  // Render based on view
   switch (view) {
     case 'splash':
-      return <Splash onStart={goOnboarding} onSkip={goDashboard} />;
+      return <Splash onStart={goOnboarding} onSkip={goApp} />;
 
     case 'onboarding':
       return <Onboarding onComplete={handleOnboardingComplete} onBack={goSplash} />;
 
-    case 'dashboard':
+    case 'app':
+    default:
       return (
-        <Dashboard
+        <AppLayout
+          activeSkillId={activeSkillId}
+          activeWorkflowId={activeWorkflowId}
+          onSelectSkill={handleSelectSkill}
+          onSelectWorkflow={handleSelectWorkflow}
+          documents={[]} // TODO: Load from database
+          onSelectDocument={() => {}} // TODO: Implement
           brand={brandStore.brand}
-          foundationComplete={brandStore.foundationComplete}
-          foundationTotal={brandStore.foundationTotal}
-          onOpenSkill={openSkill}
-          onOpenWorkflow={openWorkflow}
-          onReset={handleReset}
-          onLogout={isAuthenticated ? handleLogout : null}
           user={user}
           syncing={brandStore.syncing}
-        />
+          onLogout={isAuthenticated ? handleLogout : null}
+          onSettings={() => setShowSettings(true)}
+        >
+          {/* Render content based on selection */}
+          {activeSkill ? (
+            <SkillChat
+              skill={activeSkill}
+              messages={chat.messages}
+              isStreaming={chat.isStreaming}
+              onSend={handleSendMessage}
+              onStop={chat.stopStreaming}
+              onBack={handleBackToOverview}
+            />
+          ) : activeWorkflow ? (
+            <WorkflowView
+              workflow={activeWorkflow}
+              onOpenSkill={handleSelectSkill}
+              onBack={handleBackToOverview}
+            />
+          ) : (
+            <MainContent
+              view="overview"
+              brand={brandStore.brand}
+              onSelectSkill={handleSelectSkill}
+            />
+          )}
+        </AppLayout>
       );
-
-    case 'skill':
-      if (!activeSkill) { setView('dashboard'); return null; }
-      return (
-        <SkillChat
-          skill={activeSkill}
-          messages={chat.messages}
-          isStreaming={chat.isStreaming}
-          onSend={handleSendMessage}
-          onStop={chat.stopStreaming}
-          onBack={goDashboard}
-        />
-      );
-
-    case 'workflow':
-      if (!activeWorkflow) { setView('dashboard'); return null; }
-      return (
-        <WorkflowView
-          workflow={activeWorkflow}
-          onOpenSkill={openSkill}
-          onBack={goDashboard}
-        />
-      );
-
-    default:
-      return <Splash onStart={goOnboarding} onSkip={goDashboard} />;
   }
 }
