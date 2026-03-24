@@ -119,6 +119,71 @@ function WelcomeView({ brand, onSelectSkill }) {
           font-family: var(--font-mono);
           color: var(--teal);
         }
+        .brand-memory {
+          margin-top: 32px;
+        }
+        .brand-memory-grid {
+          display: grid;
+          gap: 16px;
+        }
+        .brand-memory-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          overflow: hidden;
+        }
+        .brand-memory-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          background: var(--bg-elevated);
+          border-bottom: 1px solid var(--border);
+        }
+        .brand-memory-title {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--text-primary);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .brand-memory-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+        }
+        .brand-memory-edit {
+          font-size: 12px;
+          color: var(--text-muted);
+          background: none;
+          border: none;
+          padding: 4px 8px;
+          border-radius: 4px;
+        }
+        .brand-memory-edit:hover {
+          color: var(--gold);
+          background: var(--gold-dim);
+        }
+        .brand-memory-content {
+          padding: 16px;
+          font-size: 13px;
+          line-height: 1.6;
+          color: var(--text-secondary);
+          max-height: 200px;
+          overflow-y: auto;
+          white-space: pre-wrap;
+        }
+        .brand-memory-empty {
+          color: var(--text-muted);
+          font-style: italic;
+        }
+        .brand-memory-preview {
+          display: -webkit-box;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
       `}</style>
 
       <div className="welcome-header">
@@ -170,6 +235,68 @@ function WelcomeView({ brand, onSelectSkill }) {
           })}
         </div>
       </div>
+
+      {/* Brand Memory Section - Show saved brand context */}
+      {foundationComplete > 0 && (
+        <div className="welcome-section brand-memory">
+          <h3 className="welcome-section-title">Your Brand Memory</h3>
+          <div className="brand-memory-grid">
+            {/* Voice Profile */}
+            {brand?.voiceProfile && (
+              <div className="brand-memory-card">
+                <div className="brand-memory-header">
+                  <span className="brand-memory-title">
+                    <span className="brand-memory-dot" style={{ background: LAYER_META.foundation.color }} />
+                    Brand Voice
+                  </span>
+                  <button className="brand-memory-edit" onClick={() => onSelectSkill('brand-voice')}>
+                    Edit
+                  </button>
+                </div>
+                <div className="brand-memory-content brand-memory-preview">
+                  {brand.voiceProfile}
+                </div>
+              </div>
+            )}
+
+            {/* Positioning */}
+            {brand?.positioning && (
+              <div className="brand-memory-card">
+                <div className="brand-memory-header">
+                  <span className="brand-memory-title">
+                    <span className="brand-memory-dot" style={{ background: LAYER_META.foundation.color }} />
+                    Positioning & Angles
+                  </span>
+                  <button className="brand-memory-edit" onClick={() => onSelectSkill('positioning-angles')}>
+                    Edit
+                  </button>
+                </div>
+                <div className="brand-memory-content brand-memory-preview">
+                  {brand.positioning}
+                </div>
+              </div>
+            )}
+
+            {/* Great Hooks */}
+            {brand?.greatHooks && (
+              <div className="brand-memory-card">
+                <div className="brand-memory-header">
+                  <span className="brand-memory-title">
+                    <span className="brand-memory-dot" style={{ background: LAYER_META.foundation.color }} />
+                    Great Hooks
+                  </span>
+                  <button className="brand-memory-edit" onClick={() => onSelectSkill('great-hooks')}>
+                    Edit
+                  </button>
+                </div>
+                <div className="brand-memory-content brand-memory-preview">
+                  {brand.greatHooks}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
