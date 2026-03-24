@@ -38,7 +38,12 @@ export default async function handler(req, res) {
       max_tokens: 4096,
       system: system || 'You are a helpful marketing assistant.',
       messages,
-      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      // Web search tool - requires organization to have it enabled in Claude Console
+      tools: [{
+        type: 'web_search_20250305',
+        name: 'web_search',
+        max_uses: 3, // Limit searches per request
+      }],
     };
 
     // ─── Streaming Mode ───

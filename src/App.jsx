@@ -8,12 +8,13 @@ import SkillChat from './components/SkillChat.jsx';
 import WorkflowView from './components/WorkflowView.jsx';
 import DocumentView from './components/DocumentView.jsx';
 import MainContent from './components/layout/MainContent.jsx';
+import AICMOChat from './components/AICMOChat.jsx';
 import { useBrandStore } from './hooks/useBrandStore.js';
 import { useChat } from './hooks/useChat.js';
 import { useChatHistory } from './hooks/useChatHistory.js';
 import { useDocuments } from './hooks/useDocuments.js';
 import { WORKFLOWS, getSkillById } from './data/skills.js';
-import { buildSystemPrompt } from './data/prompts.js';
+import { buildSystemPrompt, buildAICMOPrompt } from './data/prompts.js';
 
 export default function App() {
   const { user, loading: authLoading, isAuthenticated, isConfigured, signOut } = useAuth();
@@ -21,12 +22,13 @@ export default function App() {
   const [activeSkillId, setActiveSkillId] = useState(null);
   const [activeWorkflowId, setActiveWorkflowId] = useState(null);
   const [activeDocumentId, setActiveDocumentId] = useState(null);
-  const [showSettings, setShowSettings] = useState(false);
+  const [showCMO, setShowCMO] = useState(false);
 
   // Pass userId to brandStore for Supabase persistence
   const userId = user?.id ? String(user.id) : null;
   const brandStore = useBrandStore(userId);
-  const chat = useChat();
+  const chat = useChat(); // For skill chats
+  const cmoChat = useChat(); // Separate chat instance for AI CMO
   const chatHistory = useChatHistory(userId, activeSkillId);
   const { documents, createDocument, updateDocument, deleteDocument, getDocument } = useDocuments(userId);
 
@@ -106,12 +108,11 @@ export default function App() {
     return response;
   }, [activeSkillId, brandStore, chat]);
 
-  // Reset
-  const handleReset = useCallback(() => {
-    brandStore.resetBrand();
-    chat.resetChat();
-    setView('onboarding');
-  }, [brandStore, chat]);
+  // AI CMO message handler
+  const handleCMOMessage = useCallback(async (userMessage) => {
+    const systemPrompt = buildAICMOPrompt(brandStore.getBrandContext());
+    return await cmoChat.sendMessage(userMessage, systemPrompt);
+  }, [brandStore, cmoChat]);
 
   // Logout
   const handleLogout = useCallback(async () => {
@@ -159,52 +160,84 @@ export default function App() {
     case 'app':
     default:
       return (
-        <AppLayout
-          activeSkillId={activeSkillId}
-          activeWorkflowId={activeWorkflowId}
-          activeDocumentId={activeDocumentId}
-          onSelectSkill={handleSelectSkill}
-          onSelectWorkflow={handleSelectWorkflow}
-          documents={documents}
-          onSelectDocument={handleSelectDocument}
-          brand={brandStore.brand}
-          user={user}
-          syncing={brandStore.syncing}
-          onLogout={isAuthenticated ? handleLogout : null}
-          onSettings={() => setShowSettings(true)}
-        >
-          {/* Render content based on selection */}
-          {activeSkill ? (
-            <SkillChat
-              skill={activeSkill}
-              messages={chat.messages}
-              isStreaming={chat.isStreaming}
-              onSend={handleSendMessage}
-              onStop={chat.stopStreaming}
-              onBack={handleBackToOverview}
-              onSaveDocument={createDocument}
-            />
-          ) : activeWorkflow ? (
-            <WorkflowView
-              workflow={activeWorkflow}
-              onOpenSkill={handleSelectSkill}
-              onBack={handleBackToOverview}
-            />
-          ) : activeDocument ? (
-            <DocumentView
-              document={activeDocument}
-              onBack={handleBackToOverview}
-              onUpdate={updateDocument}
-              onDelete={deleteDocument}
-            />
-          ) : (
-            <MainContent
-              view="overview"
-              brand={brandStore.brand}
-              onSelectSkill={handleSelectSkill}
+        <>
+          <AppLayout
+            activeSkillId={activeSkillId}
+            activeWorkflowId={activeWorkflowId}
+            activeDocumentId={activeDocumentId}
+            onSelectSkill={handleSelectSkill}
+            onSelectWorkflow={handleSelectWorkflow}
+            documents={documents}
+            onSelectDocument={handleSelectDocument}
+            brand={brandStore.brand}
+            user={user}
+            syncing={brandStore.syncing}
+            onLogout={isAuthenticated ? handleLogout : null}
+            onOpenCMO={() => setShowCMO(true)}
+          >
+            {/* Render content based on selection */}
+            {activeSkill ? (
+              <SkillChat
+                skill={activeSkill}
+                messages={chat.messages}
+                isStreaming={chat.isStreaming}
+                onSend={handleSendMessage}
+                onStop={chat.stopStreaming}
+                onBack={handleBackToOverview}
+                onSaveDocument={createDocument}
+              />
+            ) : activeWorkflow ? (
+              <WorkflowView
+                workflow={activeWorkflow}
+                onOpenSkill={handleSelectSkill}
+                onBack={handleBackToOverview}
+              />
+            ) : activeDocument ? (
+              <DocumentView
+                document={activeDocument}
+                onBack={handleBackToOverview}
+                onUpdate={updateDocument}
+                onDelete={deleteDocument}
+              />
+            ) : (
+              <MainContent
+                view="overview"
+                brand={brandStore.brand}
+                onSelectSkill={handleSelectSkill}
+              />
+            )}
+          </AppLayout>
+
+          {/* AI CMO Chat Panel */}
+          <AICMOChat
+            isOpen={showCMO}
+            onClose={() => setShowCMO(false)}
+            messages={cmoChat.messages}
+            isStreaming={cmoChat.isStreaming}
+            onSend={handleCMOMessage}
+            onStop={cmoChat.stopStreaming}
+            onSelectSkill={(skillId) => {
+              setShowCMO(false);
+              handleSelectSkill(skillId);
+            }}
+          />
+
+          {/* Backdrop for CMO panel */}
+          {showCMO && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 420,
+                bottom: 0,
+                background: 'rgba(0,0,0,0.3)',
+                zIndex: 999,
+              }}
+              onClick={() => setShowCMO(false)}
             />
           )}
-        </AppLayout>
+        </>
       );
   }
 }

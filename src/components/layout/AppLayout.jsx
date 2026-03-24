@@ -14,7 +14,7 @@ export default function AppLayout({
   user,
   syncing,
   onLogout,
-  onSettings,
+  onOpenCMO,
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -94,6 +94,17 @@ export default function AppLayout({
           border-color: var(--red);
           color: var(--red);
         }
+        .app-header-btn--cmo {
+          background: linear-gradient(135deg, #E8B931 0%, #4ECDC4 100%);
+          border: none;
+          color: var(--bg-primary);
+          font-weight: 500;
+        }
+        .app-header-btn--cmo:hover {
+          opacity: 0.9;
+          background: linear-gradient(135deg, #E8B931 0%, #4ECDC4 100%);
+          color: var(--bg-primary);
+        }
         .app-content {
           flex: 1;
           overflow: hidden;
@@ -124,9 +135,9 @@ export default function AppLayout({
               <span>{userDisplay.name}</span>
             </div>
           )}
-          {onSettings && (
-            <button className="app-header-btn" onClick={onSettings}>
-              Settings
+          {onOpenCMO && (
+            <button className="app-header-btn app-header-btn--cmo" onClick={onOpenCMO}>
+              AI CMO
             </button>
           )}
           {onLogout && (
