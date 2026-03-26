@@ -5,9 +5,9 @@ export default function Splash({ onStart, onSkip }) {
   useEffect(() => { setVisible(true); }, []);
 
   const stats = [
-    { n: '11', l: 'Skills' },
+    { n: '12', l: 'Skills' },
     { n: '5', l: 'Creative Modes' },
-    { n: '7', l: 'Workflows' },
+    { n: '7', l: 'Playbooks' },
     { n: '6', l: 'JSON Schemas' },
   ];
 

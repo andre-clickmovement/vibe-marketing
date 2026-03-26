@@ -90,7 +90,7 @@ export default function WorkflowView({ workflow, onOpenSkill, onBack }) {
           letterSpacing: 2,
           textTransform: 'uppercase',
           marginBottom: 8
-        }}>Workflow</div>
+        }}>Playbook</div>
         <h1 className="wfv-title">{workflow.name}</h1>
         <p className="wfv-desc">{workflow.description}</p>
         <div className="wfv-time">Estimated: {workflow.time}</div>

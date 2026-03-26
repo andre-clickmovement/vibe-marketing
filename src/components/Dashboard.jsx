@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SKILLS, WORKFLOWS, LAYER_META, getSkillById } from '../data/skills.js';
+import { SKILLS, PLAYBOOKS, LAYER_META, getSkillById } from '../data/skills.js';
 
 // Safely extract user display info
 const getUserDisplay = (user) => {
@@ -236,7 +236,7 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
         }
         .skill-card-name { font-weight: 500; font-size: 15px; margin-bottom: 4px; }
         .skill-card-tag { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
-        /* Workflows */
+        /* Playbooks */
         .wf-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -460,11 +460,11 @@ export default function Dashboard({ brand, foundationComplete, foundationTotal, 
           })}
         </div>
 
-        {/* Workflows */}
+        {/* Playbooks */}
         <div>
-          <h2 className="section-title">Workflows</h2>
+          <h2 className="section-title">Playbooks</h2>
           <div className="wf-grid">
-            {WORKFLOWS.map((wf) => (
+            {PLAYBOOKS.map((wf) => (
               <div key={wf.id} className="wf-card" onClick={() => onOpenWorkflow(wf.id)}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div style={{ fontWeight: 600, fontSize: 16 }}>{wf.name}</div>

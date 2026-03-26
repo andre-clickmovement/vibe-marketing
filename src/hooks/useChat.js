@@ -1,8 +1,15 @@
 import { useState, useCallback, useRef } from 'react';
 
+// Check if message contains a URL (likely needs tool use)
+function containsUrl(text) {
+  const urlPattern = /https?:\/\/[^\s]+|www\.[^\s]+|\b[\w-]+\.(com|ai|io|co|org|net|app)\b/i;
+  return urlPattern.test(text);
+}
+
 export function useChat() {
   const [messages, setMessages] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isFetchingUrl, setIsFetchingUrl] = useState(false);
   const abortRef = useRef(null);
 
   const sendMessage = useCallback(async (userMessage, systemPrompt) => {
@@ -11,8 +18,13 @@ export function useChat() {
     setMessages(updatedMessages);
     setIsStreaming(true);
 
+    // If message contains a URL, use non-streaming for tool use support
+    const useStreaming = !containsUrl(userMessage);
+    if (!useStreaming) {
+      setIsFetchingUrl(true);
+    }
+
     try {
-      // Try streaming first
       abortRef.current = new AbortController();
 
       const res = await fetch('/api/chat', {
@@ -21,7 +33,7 @@ export function useChat() {
         body: JSON.stringify({
           system: systemPrompt,
           messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
-          stream: true,
+          stream: useStreaming,
         }),
         signal: abortRef.current.signal,
       });
@@ -108,6 +120,7 @@ export function useChat() {
       return errorMsg;
     } finally {
       setIsStreaming(false);
+      setIsFetchingUrl(false);
       abortRef.current = null;
     }
   }, [messages]);
@@ -121,8 +134,9 @@ export function useChat() {
   const resetChat = useCallback(() => {
     setMessages([]);
     setIsStreaming(false);
+    setIsFetchingUrl(false);
     if (abortRef.current) abortRef.current.abort();
   }, []);
 
-  return { messages, setMessages, isStreaming, sendMessage, stopStreaming, resetChat };
+  return { messages, setMessages, isStreaming, isFetchingUrl, sendMessage, stopStreaming, resetChat };
 }

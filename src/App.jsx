@@ -214,6 +214,7 @@ export default function App() {
             onClose={() => setShowCMO(false)}
             messages={cmoChat.messages}
             isStreaming={cmoChat.isStreaming}
+            isFetchingUrl={cmoChat.isFetchingUrl}
             onSend={handleCMOMessage}
             onStop={cmoChat.stopStreaming}
             onSelectSkill={(skillId) => {

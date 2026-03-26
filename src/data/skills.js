@@ -38,22 +38,22 @@ export const SKILLS = [
     ],
   },
   {
-    id: 'great-hooks',
-    name: 'Great Hooks',
+    id: 'market-research',
+    name: 'Market Research',
     layer: 'foundation',
-    shortLabel: 'GH',
-    tagline: 'High-converting sales leads using the six archetypes',
+    shortLabel: 'MR',
+    tagline: 'Strategic industry research and competitive analysis',
     description:
-      'Expert copywriting of sales leads using the six-archetype system from Great Leads — Offer, Promise, Problem-Solution, Secret, Proclamation, and Story leads.',
-    time: '15–25 min',
-    produces: 'sales lead copy',
-    brandKey: 'greatHooks',
+      'Generates a comprehensive 10-20 page strategic industry research brief. Conducts live web research, analyzes competitors, builds buyer personas, and develops brand positioning and GTM strategies.',
+    time: '20–30 min',
+    produces: 'research-brief.md',
+    brandKey: 'marketResearch',
     needs: [],
     quickPrompts: [
-      'Write an Offer Lead for my product',
-      'Create a Story Lead for my sales page',
-      'Diagnose my prospect awareness level',
-      'Which lead type should I use for my market?',
+      'Create a market research report for my industry',
+      'Analyze my top 5 competitors',
+      'Build buyer personas for my business',
+      'What\'s the market size for my niche?',
     ],
   },
 
@@ -215,16 +215,34 @@ export const SKILLS = [
       'Build an ad creative testing matrix',
     ],
   },
+  {
+    id: 'daily-dose-emails',
+    name: 'Daily Dose Emails',
+    layer: 'marketing-execution',
+    shortLabel: 'DD',
+    tagline: 'High-converting email campaigns using MOJO methodology',
+    description:
+      'Builds daily emails and multi-email marketing campaigns using Travis Sago\'s MOJO email promotion methodology. Enforces a strict intake process to ensure emails are built on real audience pain points, personal stories, and clear insights.',
+    time: '15–25 min',
+    produces: 'email campaign',
+    needs: ['voiceProfile', 'positioning'],
+    quickPrompts: [
+      'Write a 5-day email campaign for my product',
+      'Create a daily email sequence that converts',
+      'Build a nurture campaign for cold leads',
+      'Write a promotional email series for my launch',
+    ],
+  },
 ];
 
-// ─── Pre-built Workflows ───
-export const WORKFLOWS = [
+// ─── Pre-built Playbooks ───
+export const PLAYBOOKS = [
   {
     id: 'from-zero',
     name: 'Starting from Zero',
     description: 'Build your brand foundation from scratch',
     trigger: 'First-time setup',
-    steps: ['brand-voice', 'positioning-angles', 'great-hooks'],
+    steps: ['brand-voice', 'positioning-angles', 'market-research'],
     time: '30–45 min',
   },
   {
@@ -232,7 +250,7 @@ export const WORKFLOWS = [
     name: 'I Have an Idea',
     description: 'Take a product idea to market-ready copy',
     trigger: '"Launch this" / "New product"',
-    steps: ['positioning-angles', 'great-hooks', 'direct-response-copy', 'lead-magnet'],
+    steps: ['positioning-angles', 'market-research', 'direct-response-copy', 'lead-magnet'],
     time: '45–60 min',
   },
   {
@@ -240,7 +258,7 @@ export const WORKFLOWS = [
     name: 'I Need Leads',
     description: 'Build a complete lead generation funnel',
     trigger: '"Build my list" / "Lead magnet funnel"',
-    steps: ['lead-magnet', 'great-hooks', 'email-sequences', 'social-creator'],
+    steps: ['lead-magnet', 'direct-response-copy', 'email-sequences', 'social-creator'],
     time: '60–90 min',
   },
   {
@@ -256,7 +274,7 @@ export const WORKFLOWS = [
     name: 'Launch Campaign',
     description: 'Full product launch across all channels',
     trigger: '"Product launch" / "Launch campaign"',
-    steps: ['positioning-angles', 'great-hooks'],
+    steps: ['positioning-angles', 'direct-response-copy', 'daily-dose-emails'],
     time: '30–45 min',
   },
   {
@@ -267,7 +285,18 @@ export const WORKFLOWS = [
     steps: ['newsletter'],
     time: '15–20 min',
   },
+  {
+    id: 'daily-dose',
+    name: 'Daily Dose Email Campaign',
+    description: 'Build a high-converting email campaign using MOJO methodology',
+    trigger: '"Daily emails" / "Email campaign"',
+    steps: ['brand-voice', 'positioning-angles', 'daily-dose-emails'],
+    time: '30–45 min',
+  },
 ];
+
+// Keep WORKFLOWS as alias for backward compatibility
+export const WORKFLOWS = PLAYBOOKS;
 
 // ─── Layer Metadata ───
 export const LAYER_META = {

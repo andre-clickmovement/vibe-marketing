@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SKILLS, WORKFLOWS, LAYER_META } from '../../data/skills.js';
+import { SKILLS, PLAYBOOKS, LAYER_META } from '../../data/skills.js';
 
 // Group skills by layer
 const getSkillsByLayer = () => {
@@ -282,21 +282,21 @@ export default function Sidebar({
 
         <div className="sidebar-divider" />
 
-        {/* Workflows Section */}
+        {/* Playbooks Section */}
         <div className="sidebar-section">
           <div
             className="sidebar-section-header"
             onClick={() => toggleSection('workflows')}
           >
             <div className="sidebar-section-dot" style={{ background: '#6366f1' }} />
-            <span className="sidebar-section-label">Workflows</span>
+            <span className="sidebar-section-label">Playbooks</span>
             <span className={`sidebar-section-chevron ${expandedSections.workflows ? 'sidebar-section-chevron--open' : ''}`}>
               ▶
             </span>
           </div>
           {expandedSections.workflows && (
             <div className="sidebar-section-items">
-              {WORKFLOWS.map(wf => {
+              {PLAYBOOKS.map(wf => {
                 const isActive = activeWorkflowId === wf.id;
                 return (
                   <button

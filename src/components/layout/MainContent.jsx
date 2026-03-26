@@ -1,8 +1,8 @@
-import { getSkillById, WORKFLOWS, LAYER_META } from '../../data/skills.js';
+import { getSkillById, LAYER_META } from '../../data/skills.js';
 
 // Welcome/Overview view when nothing is selected
 function WelcomeView({ brand, onSelectSkill }) {
-  const foundationSkills = ['brand-voice', 'positioning-angles', 'great-hooks'];
+  const foundationSkills = ['brand-voice', 'positioning-angles', 'market-research'];
   const foundationComplete = foundationSkills.filter(id => {
     const skill = getSkillById(id);
     return skill?.brandKey && brand?.[skill.brandKey];

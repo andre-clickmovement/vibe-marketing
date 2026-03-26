@@ -26,6 +26,7 @@ export default function AICMOChat({
   onClose,
   messages,
   isStreaming,
+  isFetchingUrl,
   onSend,
   onStop,
   onSelectSkill,
@@ -234,16 +235,23 @@ export default function AICMOChat({
           gap: 10px;
           margin-bottom: 16px;
         }
+        .cmo-loading-content {
+          padding: 8px 0;
+        }
         .cmo-dots {
           display: flex;
           gap: 4px;
-          padding: 8px 0;
         }
         .cmo-dot {
           width: 6px;
           height: 6px;
           border-radius: 50%;
           background: var(--gold);
+        }
+        .cmo-fetching {
+          font-size: 13px;
+          color: var(--gold);
+          font-style: italic;
         }
         .cmo-input-bar {
           padding: 12px 16px;
@@ -367,10 +375,16 @@ export default function AICMOChat({
             {isStreaming && messages.length > 0 && messages[messages.length - 1].role !== 'assistant' && (
               <div className="cmo-loading">
                 <div className="cmo-msg-avatar cmo-msg-avatar--ai">CMO</div>
-                <div className="cmo-dots">
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="cmo-dot" style={{ animation: `pulse 1.2s ease infinite ${i * 0.2}s` }} />
-                  ))}
+                <div className="cmo-loading-content">
+                  {isFetchingUrl ? (
+                    <div className="cmo-fetching">Fetching website...</div>
+                  ) : (
+                    <div className="cmo-dots">
+                      {[0, 1, 2].map((i) => (
+                        <div key={i} className="cmo-dot" style={{ animation: `pulse 1.2s ease infinite ${i * 0.2}s` }} />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
