@@ -181,10 +181,14 @@ export default function App() {
                 skill={activeSkill}
                 messages={chat.messages}
                 isStreaming={chat.isStreaming}
+                isUploading={chat.isUploading}
+                attachments={chat.attachments}
                 onSend={handleSendMessage}
                 onStop={chat.stopStreaming}
                 onBack={handleBackToOverview}
                 onSaveDocument={createDocument}
+                onAddAttachments={chat.addAttachments}
+                onRemoveAttachment={chat.removeAttachment}
               />
             ) : activeWorkflow ? (
               <WorkflowView
@@ -215,8 +219,12 @@ export default function App() {
             messages={cmoChat.messages}
             isStreaming={cmoChat.isStreaming}
             isFetchingUrl={cmoChat.isFetchingUrl}
+            isUploading={cmoChat.isUploading}
+            attachments={cmoChat.attachments}
             onSend={handleCMOMessage}
             onStop={cmoChat.stopStreaming}
+            onAddAttachments={cmoChat.addAttachments}
+            onRemoveAttachment={cmoChat.removeAttachment}
             onSelectSkill={(skillId) => {
               setShowCMO(false);
               handleSelectSkill(skillId);

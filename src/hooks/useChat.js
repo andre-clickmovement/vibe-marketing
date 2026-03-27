@@ -6,17 +6,111 @@ function containsUrl(text) {
   return urlPattern.test(text);
 }
 
+// Upload files and get extracted content
+async function uploadFiles(files) {
+  const formData = new FormData();
+  files.forEach(file => formData.append('file', file));
+
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Upload failed' }));
+    throw new Error(err.error || 'Upload failed');
+  }
+
+  return res.json();
+}
+
 export function useChat() {
   const [messages, setMessages] = useState([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [isFetchingUrl, setIsFetchingUrl] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [attachments, setAttachments] = useState([]); // Current pending attachments
   const abortRef = useRef(null);
 
-  const sendMessage = useCallback(async (userMessage, systemPrompt) => {
-    // Add user message immediately
-    const updatedMessages = [...messages, { role: 'user', content: userMessage }];
+  // Add files to pending attachments
+  const addAttachments = useCallback(async (files) => {
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      const result = await uploadFiles(Array.from(files));
+      if (result.success && result.files) {
+        setAttachments(prev => [...prev, ...result.files]);
+      }
+      return result.files;
+    } catch (err) {
+      console.error('Upload error:', err);
+      throw err;
+    } finally {
+      setIsUploading(false);
+    }
+  }, []);
+
+  // Remove a pending attachment
+  const removeAttachment = useCallback((index) => {
+    setAttachments(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  // Clear all pending attachments
+  const clearAttachments = useCallback(() => {
+    setAttachments([]);
+  }, []);
+
+  const sendMessage = useCallback(async (userMessage, systemPrompt, messageAttachments = null) => {
+    // Use provided attachments or current pending ones
+    const filesToSend = messageAttachments || attachments;
+
+    // Build user message content (can be string or array for multimodal)
+    let userContent = userMessage;
+
+    if (filesToSend.length > 0) {
+      const contentParts = [];
+
+      // Add file contents
+      for (const file of filesToSend) {
+        if (file.type === 'image') {
+          // Images go as image blocks for Claude Vision
+          contentParts.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: file.mimetype,
+              data: file.content,
+            },
+          });
+        } else {
+          // Text-based files get added as text context
+          contentParts.push({
+            type: 'text',
+            text: `[File: ${file.filename}]\n${file.content}\n[End of file]`,
+          });
+        }
+      }
+
+      // Add the user's message text
+      contentParts.push({ type: 'text', text: userMessage });
+      userContent = contentParts;
+    }
+
+    // Add user message immediately (display version)
+    const displayMessage = {
+      role: 'user',
+      content: userMessage,
+      attachments: filesToSend.length > 0 ? filesToSend.map(f => ({ filename: f.filename, type: f.type })) : undefined,
+    };
+    const updatedMessages = [...messages, displayMessage];
     setMessages(updatedMessages);
     setIsStreaming(true);
+
+    // Clear pending attachments after sending
+    if (!messageAttachments) {
+      setAttachments([]);
+    }
 
     // If message contains a URL, use non-streaming for tool use support
     const useStreaming = !containsUrl(userMessage);
@@ -27,12 +121,16 @@ export function useChat() {
     try {
       abortRef.current = new AbortController();
 
+      // Build API messages (with actual content)
+      const apiMessages = messages.map((m) => ({ role: m.role, content: m.content }));
+      apiMessages.push({ role: 'user', content: userContent });
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           system: systemPrompt,
-          messages: updatedMessages.map((m) => ({ role: m.role, content: m.content })),
+          messages: apiMessages,
           stream: useStreaming,
         }),
         signal: abortRef.current.signal,
@@ -138,5 +236,18 @@ export function useChat() {
     if (abortRef.current) abortRef.current.abort();
   }, []);
 
-  return { messages, setMessages, isStreaming, isFetchingUrl, sendMessage, stopStreaming, resetChat };
+  return {
+    messages,
+    setMessages,
+    isStreaming,
+    isFetchingUrl,
+    isUploading,
+    attachments,
+    sendMessage,
+    stopStreaming,
+    resetChat,
+    addAttachments,
+    removeAttachment,
+    clearAttachments,
+  };
 }

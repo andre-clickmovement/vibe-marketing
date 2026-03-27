@@ -84,18 +84,30 @@ export default function Sidebar({
         .sidebar--collapsed .sidebar-title {
           display: none;
         }
+        .sidebar--collapsed .sidebar-logo {
+          display: none;
+        }
+        .sidebar--collapsed .sidebar-header {
+          justify-content: center;
+        }
         .sidebar-collapse-btn {
           margin-left: auto;
           background: none;
           border: none;
           color: var(--text-muted);
-          padding: 4px;
+          padding: 8px;
           display: flex;
           align-items: center;
           justify-content: center;
+          cursor: pointer;
+          border-radius: 6px;
         }
         .sidebar-collapse-btn:hover {
           color: var(--text-primary);
+          background: var(--bg-elevated);
+        }
+        .sidebar--collapsed .sidebar-collapse-btn {
+          margin-left: 0;
         }
         .sidebar-content {
           flex: 1;

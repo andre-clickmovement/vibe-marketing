@@ -27,13 +27,18 @@ export default function AICMOChat({
   messages,
   isStreaming,
   isFetchingUrl,
+  isUploading,
+  attachments,
   onSend,
   onStop,
   onSelectSkill,
+  onAddAttachments,
+  onRemoveAttachment,
 }) {
   const [input, setInput] = useState('');
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -57,6 +62,29 @@ export default function AICMOChat({
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      try {
+        await onAddAttachments(files);
+      } catch (err) {
+        console.error('Failed to upload:', err);
+      }
+    }
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
+  const getFileIcon = (type) => {
+    switch (type) {
+      case 'pdf': return '📄';
+      case 'docx': return '📝';
+      case 'xlsx': return '📊';
+      case 'image': return '🖼️';
+      default: return '📎';
     }
   };
 
@@ -316,6 +344,83 @@ export default function AICMOChat({
           opacity: 1;
           pointer-events: auto;
         }
+        .cmo-attachments {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+        .cmo-attachment {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 10px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+        .cmo-attachment-icon {
+          font-size: 14px;
+        }
+        .cmo-attachment-name {
+          max-width: 120px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .cmo-attachment-remove {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 14px;
+          padding: 0 2px;
+          line-height: 1;
+          cursor: pointer;
+        }
+        .cmo-attachment-remove:hover {
+          color: var(--red);
+        }
+        .cmo-upload-btn {
+          padding: 12px;
+          background: var(--bg-card);
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          color: var(--text-muted);
+          font-size: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .cmo-upload-btn:hover {
+          border-color: var(--gold);
+          color: var(--gold);
+        }
+        .cmo-upload-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .cmo-file-input {
+          display: none;
+        }
+        .cmo-msg-attachments {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+        .cmo-msg-attachment {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          background: var(--bg-primary);
+          border-radius: 4px;
+          font-size: 11px;
+          color: var(--text-muted);
+        }
       `}</style>
 
       <div className="cmo-header">
@@ -365,7 +470,18 @@ export default function AICMOChat({
                 </div>
                 <div className="cmo-msg-content markdown-content">
                   {msg.role === 'user' ? (
-                    <p>{msg.content}</p>
+                    <>
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div className="cmo-msg-attachments">
+                          {msg.attachments.map((att, j) => (
+                            <span key={j} className="cmo-msg-attachment">
+                              {getFileIcon(att.type)} {att.filename}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      <p>{msg.content}</p>
+                    </>
                   ) : (
                     <SimpleMarkdown>{msg.content}</SimpleMarkdown>
                   )}
@@ -393,21 +509,57 @@ export default function AICMOChat({
       </div>
 
       <div className="cmo-input-bar">
+        {/* Attachment preview */}
+        {attachments.length > 0 && (
+          <div className="cmo-attachments">
+            {attachments.map((file, i) => (
+              <div key={i} className="cmo-attachment">
+                <span className="cmo-attachment-icon">{getFileIcon(file.type)}</span>
+                <span className="cmo-attachment-name">{file.filename}</span>
+                <button
+                  className="cmo-attachment-remove"
+                  onClick={() => onRemoveAttachment(i)}
+                  title="Remove"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="cmo-input-row">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="cmo-file-input"
+            onChange={handleFileSelect}
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.md,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.gif,.webp"
+          />
+          {/* Upload button */}
+          <button
+            className="cmo-upload-btn"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isStreaming || isUploading}
+            title="Attach files"
+          >
+            {isUploading ? '...' : '📎'}
+          </button>
           <input
             ref={inputRef}
             className="cmo-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask your AI CMO..."
+            placeholder={attachments.length > 0 ? "Add a message about your files..." : "Ask your AI CMO..."}
           />
           {isStreaming ? (
             <button className="cmo-stop" onClick={onStop}>Stop</button>
           ) : (
             <button
               className="cmo-send"
-              disabled={!input.trim()}
+              disabled={!input.trim() && attachments.length === 0}
               onClick={handleSend}
             >
               Send

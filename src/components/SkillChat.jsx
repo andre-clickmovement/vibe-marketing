@@ -38,11 +38,24 @@ function SimpleMarkdown({ children }) {
   return <div dangerouslySetInnerHTML={{ __html: `<p>${html}</p>` }} />;
 }
 
-export default function SkillChat({ skill, messages, isStreaming, onSend, onStop, onBack, onSaveDocument }) {
+export default function SkillChat({
+  skill,
+  messages,
+  isStreaming,
+  isUploading,
+  attachments = [],
+  onSend,
+  onStop,
+  onBack,
+  onSaveDocument,
+  onAddAttachments,
+  onRemoveAttachment,
+}) {
   const [input, setInput] = useState('');
   const [saveStatus, setSaveStatus] = useState(null); // null | 'saving' | 'saved'
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // Get the last assistant message for saving
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
@@ -84,6 +97,28 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleFileSelect = async (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0 && onAddAttachments) {
+      try {
+        await onAddAttachments(files);
+      } catch (err) {
+        console.error('Failed to upload:', err);
+      }
+    }
+    e.target.value = '';
+  };
+
+  const getFileIcon = (type) => {
+    switch (type) {
+      case 'pdf': return '📄';
+      case 'docx': return '📝';
+      case 'xlsx': return '📊';
+      case 'image': return '🖼️';
+      default: return '📎';
     }
   };
 
@@ -311,6 +346,83 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
           border-color: var(--teal);
           color: var(--teal);
         }
+        .chat-attachments {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+        .chat-attachment {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 10px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border);
+          border-radius: 6px;
+          font-size: 12px;
+          color: var(--text-secondary);
+        }
+        .chat-attachment-icon {
+          font-size: 14px;
+        }
+        .chat-attachment-name {
+          max-width: 150px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .chat-attachment-remove {
+          background: none;
+          border: none;
+          color: var(--text-muted);
+          font-size: 14px;
+          padding: 0 2px;
+          line-height: 1;
+          cursor: pointer;
+        }
+        .chat-attachment-remove:hover {
+          color: var(--red);
+        }
+        .chat-upload-btn {
+          padding: 14px;
+          background: var(--bg-card);
+          border: 1px solid var(--border-hover);
+          border-radius: 10px;
+          color: var(--text-muted);
+          font-size: 18px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .chat-upload-btn:hover {
+          border-color: var(--gold);
+          color: var(--gold);
+        }
+        .chat-upload-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+        .chat-file-input {
+          display: none;
+        }
+        .chat-msg-attachments {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+        .chat-msg-attachment {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          background: var(--bg-primary);
+          border-radius: 4px;
+          font-size: 11px;
+          color: var(--text-muted);
+        }
       `}</style>
 
       {/* Header */}
@@ -372,7 +484,18 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
                 {msg.role === 'user' ? 'YOU' : skill.name.toUpperCase()}
               </div>
               {msg.role === 'user' ? (
-                <div className="chat-msg-user">{msg.content}</div>
+                <div className="chat-msg-user">
+                  {msg.attachments && msg.attachments.length > 0 && (
+                    <div className="chat-msg-attachments">
+                      {msg.attachments.map((att, j) => (
+                        <span key={j} className="chat-msg-attachment">
+                          {getFileIcon(att.type)} {att.filename}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {msg.content}
+                </div>
               ) : (
                 <div className="chat-msg-assistant markdown-content">
                   <SimpleMarkdown>{msg.content}</SimpleMarkdown>
@@ -408,21 +531,59 @@ export default function SkillChat({ skill, messages, isStreaming, onSend, onStop
 
       {/* Input */}
       <div className="chat-input-bar">
+        {/* Attachment preview */}
+        {attachments.length > 0 && (
+          <div className="chat-attachments">
+            {attachments.map((file, i) => (
+              <div key={i} className="chat-attachment">
+                <span className="chat-attachment-icon">{getFileIcon(file.type)}</span>
+                <span className="chat-attachment-name">{file.filename}</span>
+                <button
+                  className="chat-attachment-remove"
+                  onClick={() => onRemoveAttachment(i)}
+                  title="Remove"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="chat-input-row">
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="chat-file-input"
+            onChange={handleFileSelect}
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.md,.csv,.xlsx,.xls,.png,.jpg,.jpeg,.gif,.webp"
+          />
+          {/* Upload button */}
+          {onAddAttachments && (
+            <button
+              className="chat-upload-btn"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isStreaming || isUploading}
+              title="Attach files"
+            >
+              {isUploading ? '...' : '📎'}
+            </button>
+          )}
           <input
             ref={inputRef}
             className="chat-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={`Message ${skill.name}...`}
+            placeholder={attachments.length > 0 ? "Add a message about your files..." : `Message ${skill.name}...`}
           />
           {isStreaming ? (
             <button className="chat-stop" onClick={onStop}>Stop</button>
           ) : (
             <button
               className="chat-send"
-              disabled={!input.trim()}
+              disabled={!input.trim() && attachments.length === 0}
               onClick={handleSend}
             >
               Send
